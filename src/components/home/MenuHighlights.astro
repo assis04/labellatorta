@@ -1,0 +1,59 @@
+---
+/** Destaques do cardápio (4 salgadas + 2 doces, definidos em menu.ts) com link para o cardápio completo. */
+import SectionHead from '../ui/SectionHead.astro';
+import TortaCard from '../ui/TortaCard.astro';
+import { destaques } from '../../data/menu';
+import { href } from '../../lib/links';
+---
+
+<section class="section" aria-labelledby="destaques-title">
+  <div class="container">
+    <SectionHead
+      label="Nosso cardápio"
+      title="Destaques do cardápio"
+      subtitle="Salgadas e doces, na fatia ou inteiras."
+      id="destaques-title"
+    />
+    <ul class="highlights">
+      {destaques.map((torta) => (
+        <li>
+          <TortaCard torta={torta} />
+        </li>
+      ))}
+    </ul>
+    <div class="highlights__more">
+      <a class="btn btn--primary" href={href('/cardapio/')}>
+        Ver cardápio completo
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .highlights {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 40px 28px;
+    margin-top: 52px;
+  }
+  .highlights__more {
+    display: flex;
+    justify-content: center;
+    margin-top: 52px;
+  }
+
+  @media (max-width: 900px) {
+    .highlights {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 36px 20px;
+    }
+  }
+  @media (max-width: 560px) {
+    .highlights {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .highlights__more .btn {
+      width: 100%;
+    }
+  }
+</style>

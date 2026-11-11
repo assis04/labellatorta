@@ -1,0 +1,157 @@
+---
+/**
+ * Almoço em faixa dividida: foto de um lado, painel terracota do outro.
+ * Dias, horário e quantidade de sabores vêm dos dados (openingHours e menu). Preço do almoço
+ * ainda não foi informado pela casa, então não aparece.
+ */
+import { Picture } from 'astro:assets';
+import Icon, { type IconName } from '../ui/Icon.astro';
+import WhatsAppIcon from '../ui/WhatsAppIcon.astro';
+import lunchPhoto from '../../assets/fotos/almoco-torta-salada-mesa.jpg';
+import { salgadas } from '../../data/menu';
+import { href, whatsappUrl } from '../../lib/links';
+import { capitalize, summarizeWeek } from './week';
+
+const week = summarizeWeek();
+const vegSalgadas = salgadas.filter((t) => t.tags.includes('vegetariana'));
+
+const facts: readonly { icon: IconName; text: string }[] = [
+  { icon: 'clock', text: `${capitalize(week.daysLong)}, a partir das ${week.opensAt}` },
+  {
+    icon: 'slice',
+    text: `${salgadas.length} sabores salgados, ${vegSalgadas.length} deles vegetarianos`,
+  },
+  { icon: 'leaf', text: 'Fatia de torta salgada + salada da casa' },
+];
+---
+
+<section class="lunch" aria-labelledby="almoco-title">
+  <div class="lunch__photo">
+    <Picture
+      src={lunchPhoto}
+      alt="Prato de almoço visto de cima, com uma fatia de torta salgada e a salada da casa sobre a mesa"
+      formats={['avif', 'webp']}
+      widths={[480, 720, 960, 1200]}
+      width={1200}
+      sizes="(max-width: 900px) 100vw, 50vw"
+    />
+  </div>
+
+  <div class="lunch__panel">
+    <div class="lunch__inner" data-reveal>
+      <span class="label lunch__label">Almoço</span>
+      <h2 class="h2 lunch__title" id="almoco-title">
+        Almoço com fatia de torta e salada da casa
+      </h2>
+      <p class="lunch__text">
+        No almoço, você escolhe uma fatia de torta salgada e acompanha com a salada da casa. Quer saber o que
+        tem hoje? É só perguntar pelo WhatsApp.
+      </p>
+      <ul class="lunch__list">
+        {facts.map((f) => (
+          <li>
+            <Icon name={f.icon} />
+            {f.text}
+          </li>
+        ))}
+      </ul>
+      <div class="btn-row btn-row--stack-mobile">
+        <a class="btn btn--light" href={href('/almoco/')}>
+          Saiba mais<span class="sr-only"> sobre o almoço</span>
+        </a>
+        <a
+          class="btn btn--ghost-light"
+          href={whatsappUrl('almoco')}
+          target="_blank"
+          rel="noopener"
+          data-track="whatsapp"
+          data-track-intent="home-almoco"
+        >
+          <WhatsAppIcon size={18} />
+          Perguntar pelo WhatsApp
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .lunch {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    min-height: 580px;
+    background: var(--brand);
+    color: #fff;
+  }
+  .lunch__photo {
+    position: relative;
+    min-height: 360px;
+    background: var(--brand-700);
+  }
+  .lunch__photo :global(picture) {
+    position: absolute;
+    inset: 0;
+  }
+  .lunch__photo :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 55%;
+  }
+  .lunch__panel {
+    display: flex;
+    align-items: center;
+    padding: 80px clamp(28px, 6vw, 96px);
+  }
+  .lunch__inner {
+    max-width: 520px;
+  }
+  .lunch__label {
+    color: var(--brand-on-dark);
+  }
+  .lunch__title {
+    margin-top: 12px;
+    color: #fff;
+  }
+  .lunch__text {
+    margin-top: 18px;
+    font-size: 15.5px;
+    line-height: 1.75;
+    color: rgba(255, 255, 255, 0.86);
+  }
+  .lunch__list {
+    margin: 28px 0 34px;
+    border-top: 1px solid rgba(255, 255, 255, 0.22);
+  }
+  .lunch__list li {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 15px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.22);
+    font-size: 15px;
+    line-height: 1.4;
+  }
+  .lunch__list :global(svg) {
+    flex: none;
+    color: var(--brand-on-dark);
+  }
+
+  @media (max-width: 900px) {
+    .lunch {
+      grid-template-columns: minmax(0, 1fr);
+      min-height: 0;
+    }
+    .lunch__photo {
+      aspect-ratio: 4 / 3;
+      min-height: 0;
+    }
+    .lunch__panel {
+      padding: 56px 20px 64px;
+    }
+    .lunch__inner {
+      max-width: 620px;
+      margin-inline: auto;
+    }
+  }
+</style>

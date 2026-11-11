@@ -1,0 +1,19 @@
+# Lista de PERMISSÃO: o contexto do build recebe só o que o `astro build` e a imagem final usam.
+# Qualquer arquivo novo fica de fora até ser liberado aqui — .env, credenciais, .git, node_modules
+# e builds locais nunca chegam ao Docker.
+*
+
+!package.json
+!package-lock.json
+!astro.config.mjs
+!tsconfig.json
+!src
+!public
+!nginx.conf
+
+# Mesmo dentro das pastas liberadas, nunca:
+**/.env
+**/.env.*
+**/*.log
+**/.DS_Store
+**/Thumbs.db

@@ -1,0 +1,141 @@
+---
+/**
+ * Instagram: grade de 6 fotos locais (nenhuma repetida de outras seções da home) que leva ao
+ * perfil. Sem widget nem script do Instagram — a CSP não libera, e a página continua leve.
+ * A grade inteira é um único link (um ponto de tabulação em vez de seis iguais).
+ */
+import { Picture } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import Icon from '../ui/Icon.astro';
+import banoffeeInteira from '../../assets/fotos/banoffee-inteira.jpg';
+import camaraoServindo from '../../assets/fotos/camarao-servindo.jpg';
+import tortaGratinada from '../../assets/fotos/torta-inteira-gratinada.jpg';
+import chocolateTopo from '../../assets/fotos/chocolate-pacoca-topo.jpg';
+import preparoCreme from '../../assets/fotos/preparo-creme-de-queijo.jpg';
+import tortasVariadas from '../../assets/fotos/tortas-variadas.jpeg';
+import { business } from '../../data/business';
+
+const { social } = business;
+
+const photos: readonly { src: ImageMetadata; alt: string }[] = [
+  { src: banoffeeInteira, alt: 'Torta banoffee inteira com raspas de chocolate e rodelas de banana ao lado' },
+  { src: camaraoServindo, alt: 'Fatia de torta de camarão sendo tirada da torta inteira' },
+  { src: tortaGratinada, alt: 'Torta salgada inteira com a cobertura gratinada, vista de cima' },
+  { src: chocolateTopo, alt: 'Torta de chocolate inteira coberta de paçoca, vista de cima' },
+  { src: preparoCreme, alt: 'Creme de queijo da casa sendo aplicado sobre o recheio de uma torta' },
+  { src: tortasVariadas, alt: 'Mesa com várias tortas inteiras, salgadas e doces' },
+];
+const linkLabel = `Ver mais fotos no Instagram ${social.instagramHandle} (abre em nova aba)`;
+---
+
+<section class="section" aria-labelledby="instagram-title">
+  <div class="container instagram">
+    <header class="instagram__head" data-reveal>
+      <span class="label">{social.instagramHandle}</span>
+      <h2 class="h2 instagram__title" id="instagram-title">
+        Acompanhe no Instagram
+      </h2>
+      <p class="instagram__sub">
+        {`Mais de ${social.instagramFollowers} pessoas já acompanham as novidades da casa por lá.`}
+      </p>
+    </header>
+
+    <a
+      class="instagram__grid"
+      href={social.instagram}
+      target="_blank"
+      rel="noopener"
+      aria-label={linkLabel}
+      data-track="instagram"
+      data-track-intent="home-grade"
+      data-reveal
+    >
+      {photos.map((photo) => (
+        <span class="instagram__tile">
+          <Picture
+            src={photo.src}
+            alt={photo.alt}
+            formats={['avif', 'webp']}
+            widths={[200, 320, 480]}
+            width={480}
+            sizes="(max-width: 768px) calc((100vw - 64px) / 3), 190px"
+          />
+        </span>
+      ))}
+    </a>
+
+    <a
+      class="btn btn--outline instagram__cta"
+      href={social.instagram}
+      target="_blank"
+      rel="noopener"
+      data-track="instagram"
+      data-track-intent="home-botao"
+    >
+      <Icon name="instagram" />
+      {`Seguir ${social.instagramHandle}`}
+      <span class="sr-only"> (abre em nova aba)</span>
+    </a>
+  </div>
+</section>
+
+<style>
+  .instagram {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .instagram__head {
+    max-width: 640px;
+  }
+  .instagram__title {
+    margin-top: 12px;
+  }
+  .instagram__sub {
+    margin-top: 12px;
+    color: var(--ink-2);
+  }
+  .instagram__grid {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 12px;
+    width: 100%;
+    margin-top: 44px;
+    border-radius: 12px;
+  }
+  .instagram__tile {
+    display: block;
+    aspect-ratio: 1;
+    overflow: hidden;
+    border-radius: 12px;
+    background: var(--bg-alt);
+  }
+  .instagram__tile :global(picture),
+  .instagram__tile :global(img) {
+    width: 100%;
+    height: 100%;
+  }
+  .instagram__tile :global(img) {
+    object-fit: cover;
+    transition: transform 0.6s var(--ease);
+  }
+  .instagram__grid:hover .instagram__tile :global(img) {
+    transform: scale(1.04);
+  }
+  .instagram__cta {
+    margin-top: 36px;
+  }
+
+  @media (max-width: 768px) {
+    .instagram__grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+  }
+  @media (max-width: 560px) {
+    .instagram__cta {
+      width: 100%;
+    }
+  }
+</style>

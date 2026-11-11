@@ -1,0 +1,61 @@
+---
+/** Faixa de fechamento das páginas: chamada para pedir/encomendar pelo WhatsApp. */
+import WhatsAppIcon from './WhatsAppIcon.astro';
+import { whatsappUrl, type WhatsappIntent } from '../../lib/links';
+import { business } from '../../data/business';
+
+interface Props {
+  title?: string;
+  text?: string;
+  intent?: WhatsappIntent;
+  buttonLabel?: string;
+}
+const {
+  title = 'Bateu a vontade?',
+  text = `Peça pelo WhatsApp ${business.phone.display} e combine a retirada ou a entrega.`,
+  intent = 'pedido',
+  buttonLabel = 'Pedir pelo WhatsApp',
+} = Astro.props;
+---
+
+<section class="cta-band">
+  <div class="container cta-band__inner" data-reveal>
+    <div>
+      <h2 class="h2 cta-band__title">{title}</h2>
+      <p class="cta-band__text">{text}</p>
+    </div>
+    <a
+      class="btn btn--light"
+      href={whatsappUrl(intent)}
+      target="_blank"
+      rel="noopener"
+      data-track="whatsapp"
+      data-track-intent={intent}
+    >
+      <WhatsAppIcon size={18} />
+      {buttonLabel}
+    </a>
+  </div>
+</section>
+
+<style>
+  .cta-band {
+    background: var(--brand);
+    color: #fff;
+    padding-block: 64px;
+  }
+  .cta-band__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px 48px;
+    flex-wrap: wrap;
+  }
+  .cta-band__title {
+    color: #fff;
+  }
+  .cta-band__text {
+    margin-top: 8px;
+    color: rgba(255, 255, 255, 0.85);
+  }
+</style>

@@ -1,0 +1,227 @@
+---
+/**
+ * Topo da home: foto em tela cheia com véu escuro, selo do Restaurant Guru, H1 da página,
+ * três chamadas (pedir, encomendar, cardápio) e o status "aberto agora" com o endereço.
+ * `data-hero` faz o header transparente virar sólido quando a foto sai da tela (site.ts).
+ */
+import { Picture } from 'astro:assets';
+import Icon from '../ui/Icon.astro';
+import OpenStatus from '../ui/OpenStatus.astro';
+import WhatsAppIcon from '../ui/WhatsAppIcon.astro';
+import heroPhoto from '../../assets/fotos/hero-fatia-frango-neon.jpg';
+import seal from '../../assets/fotos/selo-restaurant-guru-2026.png';
+import { business } from '../../data/business';
+import { href, whatsappUrl } from '../../lib/links';
+
+const { award, address } = business;
+---
+
+<section class="hero" data-hero aria-labelledby="hero-title">
+  <div class="hero__media">
+    <Picture
+      src={heroPhoto}
+      alt={`Fatia de torta de frango servida numa espátula, com o letreiro em neon da ${business.name} ao fundo`}
+      formats={['avif', 'webp']}
+      widths={[640, 960, 1280, 1600, 2000]}
+      width={2000}
+      sizes="100vw"
+      loading="eager"
+      fetchpriority="high"
+    />
+  </div>
+
+  <div class="container hero__content">
+    <p class="hero__badge">
+      <span class="hero__seal">
+        <Picture
+          src={seal}
+          alt=""
+          formats={['avif', 'webp']}
+          widths={[30, 60, 90]}
+          width={90}
+          sizes="30px"
+          loading="eager"
+        />
+      </span>
+      {`${award.name} ${award.year}`}
+    </p>
+
+    <h1 class="hero__title" id="hero-title">
+      Tortas artesanais no {address.neighborhood}
+    </h1>
+    <p class="hero__lead">
+      Massa fininha e recheio em dobro. Peça pelo WhatsApp, encomende sua torta inteira ou venha almoçar com a
+      gente.
+    </p>
+
+    <div class="hero__ctas">
+      <a
+        class="btn btn--primary"
+        href={whatsappUrl('pedido')}
+        target="_blank"
+        rel="noopener"
+        data-track="whatsapp"
+        data-track-intent="home-hero"
+      >
+        <WhatsAppIcon size={18} />
+        Pedir pelo WhatsApp
+      </a>
+      <a class="btn btn--light" href={href('/encomendas/')}>
+        Encomendar torta inteira
+      </a>
+      <a class="btn btn--ghost-light" href={href('/cardapio/')}>
+        Ver cardápio
+      </a>
+    </div>
+
+    <div class="hero__info">
+      <OpenStatus />
+      <span class="hero__addr">
+        <Icon name="pin" size={15} />
+        {address.street} · {address.neighborhood}
+      </span>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    isolation: isolate;
+    min-height: 100svh;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    background: #1d1510;
+    color: #fff;
+    text-align: center;
+  }
+  .hero__media {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+  }
+  .hero__media :global(picture),
+  .hero__media :global(img) {
+    width: 100%;
+    height: 100%;
+  }
+  .hero__media :global(img) {
+    object-fit: cover;
+    object-position: 50% 50%;
+  }
+  /* Véu para legibilidade do texto branco sobre a foto (não é decorativo). */
+  .hero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(
+      180deg,
+      rgba(22, 15, 10, 0.66) 0%,
+      rgba(22, 15, 10, 0.52) 42%,
+      rgba(22, 15, 10, 0.76) 100%
+    );
+  }
+
+  .hero__content {
+    max-width: 860px;
+    padding: calc(var(--header-h) + 56px) 0 88px;
+  }
+
+  .hero__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 5px 16px 5px 5px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(22, 15, 10, 0.45);
+    font: 500 12.5px/1.25 var(--sans);
+    text-align: left;
+  }
+  .hero__seal {
+    flex: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: #fff;
+  }
+  .hero__seal :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 28%;
+  }
+
+  .hero__title {
+    margin-top: 24px;
+    font: 500 clamp(38px, 5.2vw, 62px) / 1.1 var(--serif);
+    text-wrap: balance;
+    text-shadow: 0 2px 24px rgba(0, 0, 0, 0.25);
+  }
+  .hero__lead {
+    max-width: 560px;
+    margin: 16px auto 0;
+    font: italic 400 16.5px/1.6 var(--sans);
+    color: rgba(255, 255, 255, 0.92);
+    text-wrap: pretty;
+  }
+
+  .hero__ctas {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 34px;
+  }
+
+  .hero__info {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px 22px;
+    margin-top: 30px;
+    font-size: 13.5px;
+    color: rgba(255, 255, 255, 0.88);
+  }
+  .hero__addr {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  /* Bolinha de status mais clara para contrastar com o fundo escuro. */
+  .hero__info :global(.status-dot) {
+    background: #6fcf7f;
+    box-shadow: 0 0 0 3px rgba(111, 207, 127, 0.25);
+  }
+  .hero__info :global([data-open='false'] .status-dot) {
+    background: #e0715b;
+    box-shadow: 0 0 0 3px rgba(224, 113, 91, 0.25);
+  }
+
+  @media (max-width: 560px) {
+    .hero__content {
+      padding: calc(var(--header-h) + 28px) 0 48px;
+    }
+    .hero__badge {
+      font-size: 12px;
+    }
+    .hero__title {
+      margin-top: 20px;
+    }
+    .hero__lead {
+      font-size: 15.5px;
+    }
+    .hero__ctas {
+      margin-top: 28px;
+    }
+    .hero__ctas .btn {
+      width: 100%;
+    }
+    .hero__info {
+      margin-top: 24px;
+    }
+  }
+</style>

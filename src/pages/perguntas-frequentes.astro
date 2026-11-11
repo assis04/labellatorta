@@ -1,0 +1,161 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/ui/PageHero.astro';
+import CtaBand from '../components/ui/CtaBand.astro';
+import Icon from '../components/ui/Icon.astro';
+import WhatsAppIcon from '../components/ui/WhatsAppIcon.astro';
+import FaqList from '../components/pages/FaqList.astro';
+import { business } from '../data/business';
+import { faq } from '../data/content';
+import { href, telUrl, whatsappUrl } from '../lib/links';
+import { faqSchema } from '../lib/schema';
+
+const title = 'Perguntas frequentes';
+const description = `Respostas sobre a ${business.name}: endereço no ${business.address.neighborhood}, horários, pedidos e encomendas pelo WhatsApp, almoço, opções vegetarianas e tortas doces.`;
+const crumbs = [
+  { name: 'Início', path: '/' },
+  { name: 'Perguntas frequentes', path: '/perguntas-frequentes/' },
+];
+const shortcuts = [
+  { label: 'Cardápio', path: '/cardapio/' },
+  { label: 'Almoço', path: '/almoco/' },
+  { label: 'Encomendas', path: '/encomendas/' },
+  { label: 'Como chegar', path: '/contato/' },
+];
+---
+
+<Base
+  title={title}
+  description={description}
+  path="/perguntas-frequentes/"
+  crumbs={crumbs}
+  schema={[faqSchema(faq)]}
+>
+  <PageHero
+    label="Dúvidas"
+    title="Perguntas frequentes"
+    lead="O que mais nos perguntam sobre a casa, os pedidos e as tortas. Não achou a sua dúvida? Chame a gente no WhatsApp."
+    crumbs={crumbs}
+  />
+
+  <section class="section" aria-label="Perguntas e respostas">
+    <div class="container faq-layout">
+      <div class="faq-layout__list">
+        <FaqList items={faq} />
+      </div>
+
+      <aside class="help" aria-labelledby="ajuda-titulo">
+        <h2 class="help__title" id="ajuda-titulo">
+          Ainda ficou alguma dúvida?
+        </h2>
+        <p class="help__text">
+          Chame a gente pelo WhatsApp ou, se preferir, ligue para {business.phone.display}.
+        </p>
+        <div class="help__buttons">
+          <a
+            class="btn btn--primary btn--block"
+            href={whatsappUrl('pedido')}
+            target="_blank"
+            rel="noopener"
+            data-track="whatsapp"
+            data-track-intent="faq-ajuda"
+          >
+            <WhatsAppIcon size={18} />
+            Chamar no WhatsApp<span class="sr-only"> (abre em nova aba)</span>
+          </a>
+          <a class="btn btn--outline btn--block" href={telUrl}>
+            <Icon name="phone" />
+            Ligar {business.phone.display}
+          </a>
+        </div>
+        <nav class="help__nav" aria-label="Atalhos">
+          <p class="help__nav-title">Atalhos</p>
+          <ul>
+            {shortcuts.map((s) => (
+              <li>
+                <a href={href(s.path)}>
+                  {s.label}
+                  <Icon name="arrow" size={16} />
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </aside>
+    </div>
+  </section>
+
+  <CtaBand />
+</Base>
+
+<style>
+  .faq-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 340px;
+    gap: 72px;
+    align-items: start;
+  }
+  .help {
+    position: sticky;
+    top: calc(var(--header-h) + 24px);
+    padding: 28px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--bg-alt);
+  }
+  .help__title {
+    font: 500 26px/1.2 var(--serif);
+  }
+  .help__text {
+    margin-top: 10px;
+    font-size: 15px;
+    color: var(--ink-2);
+  }
+  .help__buttons {
+    display: grid;
+    gap: 10px;
+    margin-top: 22px;
+  }
+  .help__nav {
+    margin-top: 28px;
+    padding-top: 22px;
+    border-top: 1px solid var(--line);
+  }
+  .help__nav-title {
+    font: 500 11px/1.3 var(--sans);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+  .help__nav ul {
+    margin-top: 8px;
+  }
+  .help__nav a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 44px;
+    border-bottom: 1px solid var(--line);
+    font-weight: 500;
+    transition: color 0.25s var(--ease);
+  }
+  .help__nav li:last-child a {
+    border-bottom: 0;
+  }
+  .help__nav a:hover {
+    color: var(--brand);
+  }
+  .help__nav :global(svg) {
+    color: var(--brand);
+  }
+  @media (max-width: 960px) {
+    .faq-layout {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 48px;
+    }
+    .help {
+      position: static;
+      max-width: 520px;
+    }
+  }
+</style>

@@ -1,0 +1,85 @@
+---
+/**
+ * Perguntas frequentes em <details> nativo: acessível por teclado e leitor de tela sem JS,
+ * com a primeira resposta aberta. O texto completo fica no HTML (Google e IAs leem tudo).
+ */
+import Icon from '../ui/Icon.astro';
+import type { FaqItem } from '../../data/content';
+
+interface Props {
+  items: readonly FaqItem[];
+  class?: string;
+}
+const { items, class: className } = Astro.props;
+---
+
+<div class:list={['faq', className]}>
+  {items.map((item, i) => (
+    <details open={i === 0}>
+      <summary>
+        <span class="faq__q">{item.question}</span>
+        <span class="faq__icon" aria-hidden="true">
+          <Icon name="plus" size={16} />
+        </span>
+      </summary>
+      <p class="faq__a">{item.answer}</p>
+    </details>
+  ))}
+</div>
+
+<style>
+  .faq {
+    border-top: 1px solid var(--line);
+  }
+  .faq details {
+    border-bottom: 1px solid var(--line);
+  }
+  .faq summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    min-height: 44px;
+    padding: 22px 4px;
+    list-style: none;
+    cursor: pointer;
+    font: 600 16.5px/1.45 var(--sans);
+    transition: color 0.25s var(--ease);
+  }
+  .faq summary::-webkit-details-marker {
+    display: none;
+  }
+  .faq summary:hover {
+    color: var(--brand);
+  }
+  .faq__icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--brand-50);
+    color: var(--brand);
+    display: grid;
+    place-items: center;
+    flex: none;
+    transition: transform 0.3s var(--ease);
+  }
+  .faq details[open] .faq__icon {
+    transform: rotate(45deg);
+  }
+  .faq__a {
+    padding: 0 56px 24px 4px;
+    color: var(--ink-2);
+    font-size: 15.5px;
+    line-height: 1.75;
+    max-width: 68ch;
+  }
+  @media (max-width: 560px) {
+    .faq summary {
+      padding: 18px 2px;
+      font-size: 16px;
+    }
+    .faq__a {
+      padding: 0 2px 22px;
+    }
+  }
+</style>

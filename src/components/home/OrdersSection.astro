@@ -1,0 +1,155 @@
+---
+/**
+ * Encomendas de torta inteira. Só fatos confirmados: todos os sabores, salgadas e doces,
+ * retirada ou entrega combinadas pelo WhatsApp. Tamanhos, prazos e preços não entram até a casa informar.
+ */
+import { Picture } from 'astro:assets';
+import Icon from '../ui/Icon.astro';
+import WhatsAppIcon from '../ui/WhatsAppIcon.astro';
+import boxPhoto from '../../assets/fotos/encomenda-caixa.jpg';
+import { business } from '../../data/business';
+import { doces, salgadas, tortas } from '../../data/menu';
+import { href, whatsappUrl } from '../../lib/links';
+
+const checks = [
+  `Todos os ${tortas.length} sabores podem ser encomendados inteiros`,
+  `${salgadas.length} salgadas e ${doces.length} doces para escolher`,
+  'Retirada na loja ou entrega, combinadas pelo WhatsApp',
+];
+---
+
+<section class="section section--alt" aria-labelledby="encomendas-title">
+  <div class="container orders">
+    <div class="orders__body" data-reveal>
+      <span class="label">Encomendas</span>
+      <h2 class="h2 orders__title" id="encomendas-title">
+        Encomende sua torta inteira
+      </h2>
+      <p class="orders__text">
+        Aniversário, reunião de trabalho, almoço de família: a torta inteira resolve a mesa. Você escolhe o
+        sabor e o dia pelo WhatsApp, a gente prepara e combina com você a retirada na loja ou a entrega.
+      </p>
+      <ul class="orders__checks">
+        {checks.map((text) => (
+          <li>
+            <Icon name="check" />
+            {text}
+          </li>
+        ))}
+      </ul>
+      <div class="orders__ctas">
+        <a
+          class="btn btn--primary"
+          href={whatsappUrl('encomenda')}
+          target="_blank"
+          rel="noopener"
+          data-track="whatsapp"
+          data-track-intent="home-encomendas"
+        >
+          <WhatsAppIcon size={18} />
+          Encomendar pelo WhatsApp
+        </a>
+        <a class="orders__link" href={href('/encomendas/')}>
+          Como funciona<span class="sr-only"> a encomenda</span>
+          <Icon name="arrow" />
+        </a>
+      </div>
+    </div>
+
+    <div class="photo orders__photo" data-reveal>
+      <Picture
+        src={boxPhoto}
+        alt={`Torta inteira gratinada sendo colocada na caixa de papel kraft da ${business.name}`}
+        formats={['avif', 'webp']}
+        widths={[480, 720, 960, 1200]}
+        width={1200}
+        sizes="(max-width: 900px) calc(100vw - 40px), 564px"
+      />
+    </div>
+  </div>
+</section>
+
+<style>
+  .orders {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 72px;
+    align-items: center;
+  }
+  .orders__title {
+    margin-top: 12px;
+  }
+  .orders__text {
+    margin-top: 18px;
+    max-width: 58ch;
+    font-size: 15.5px;
+    line-height: 1.75;
+    color: var(--ink-2);
+  }
+  .orders__checks {
+    display: grid;
+    gap: 12px;
+    margin: 26px 0 32px;
+  }
+  .orders__checks li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+  .orders__checks :global(svg) {
+    flex: none;
+    margin-top: 2px;
+    color: var(--brand);
+  }
+  .orders__ctas {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 24px;
+  }
+  .orders__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 48px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--brand);
+    text-decoration: underline;
+    text-decoration-color: transparent;
+    text-underline-offset: 4px;
+    transition: text-decoration-color 0.25s var(--ease);
+  }
+  .orders__link:hover {
+    text-decoration-color: currentColor;
+  }
+  .orders__link :global(svg) {
+    transition: transform 0.25s var(--ease);
+  }
+  .orders__link:hover :global(svg) {
+    transform: translateX(3px);
+  }
+  .orders__photo {
+    aspect-ratio: 4 / 3;
+  }
+  .orders__photo :global(picture) {
+    height: 100%;
+  }
+
+  @media (max-width: 900px) {
+    .orders {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 40px;
+    }
+  }
+  @media (max-width: 560px) {
+    .orders__ctas {
+      justify-content: center;
+    }
+    .orders__ctas .btn {
+      width: 100%;
+    }
+  }
+</style>

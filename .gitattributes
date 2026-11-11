@@ -1,0 +1,8 @@
+# Quebra de linha LF em todo lugar (o CI roda em Linux e o Prettier exige LF).
+* text=auto eol=lf
+
+*.jpg binary
+*.jpeg binary
+*.png binary
+*.ico binary
+*.woff2 binary

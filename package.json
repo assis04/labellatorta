@@ -1,0 +1,48 @@
+{
+  "name": "labellatorta-site",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Site oficial da La Bella Torta — tortaria artesanal no Parque São Jorge, São Paulo.",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:unit": "vitest run tests/unit",
+    "test:dist": "vitest run tests/dist",
+    "verify": "npm run check && npm run lint && npm run format:check && npm run test:unit && npm run build && npm run test:dist",
+    "images": "node scripts/fetch-images.mjs"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "3.7.4",
+    "@fontsource-variable/dm-sans": "5.3.0",
+    "@fontsource/cormorant-garamond": "5.3.0",
+    "astro": "7.4.10",
+    "sharp": "0.35.5"
+  },
+  "devDependencies": {
+    "@astrojs/check": "0.9.12",
+    "@eslint/js": "10.0.1",
+    "eslint": "10.14.0",
+    "eslint-plugin-astro": "3.2.1",
+    "eslint-plugin-jsx-a11y-x": "0.2.0",
+    "globals": "17.14.0",
+    "node-html-parser": "9.0.7",
+    "prettier": "3.9.10",
+    "prettier-plugin-astro": "1.1.2",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.72.2",
+    "vitest": "5.1.0"
+  },
+  "overrides": {
+    "minimatch": "11.0.6"
+  }
+}

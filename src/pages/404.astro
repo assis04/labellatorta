@@ -1,0 +1,142 @@
+---
+/**
+ * Página 404 (o GitHub Pages serve este arquivo para qualquer endereço inexistente, em qualquer
+ * profundidade — por isso todos os links passam por `href()`, que aplica o base path).
+ */
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/ui/PageHero.astro';
+import Icon, { type IconName } from '../components/ui/Icon.astro';
+import WhatsAppIcon from '../components/ui/WhatsAppIcon.astro';
+import { business, openingHours } from '../data/business';
+import { tortas } from '../data/menu';
+import { href, whatsappUrl } from '../lib/links';
+import { daysLabel, earliestOpening, openDays } from '../components/pages/hours-text';
+
+const title = 'Página não encontrada';
+const description = `A página que você procurou não existe ou mudou de endereço. Veja o cardápio da ${business.name}, volte ao início ou faça seu pedido pelo WhatsApp.`;
+const crumbs = [
+  { name: 'Início', path: '/' },
+  { name: 'Página não encontrada', path: '/404.html' },
+];
+
+const suggestions: { icon: IconName; label: string; text: string; path: string }[] = [
+  {
+    icon: 'list',
+    label: 'Cardápio',
+    text: `Os ${tortas.length} sabores, salgados e doces.`,
+    path: '/cardapio/',
+  },
+  {
+    icon: 'clock',
+    label: 'Almoço',
+    text: `Fatia de torta e salada, de ${daysLabel(openDays(openingHours))}, a partir das ${earliestOpening(openingHours)}.`,
+    path: '/almoco/',
+  },
+  { icon: 'bag', label: 'Encomendas', text: 'Monte o pedido da torta inteira.', path: '/encomendas/' },
+  { icon: 'pin', label: 'Como chegar', text: 'Endereço, horários e contato.', path: '/contato/' },
+];
+---
+
+<Base title={title} description={description} path="/404.html" noindex>
+  <PageHero
+    label="Erro 404"
+    title="Esta página não está aqui"
+    lead="O endereço pode ter mudado com o site novo ou ter sido digitado com alguma diferença. As tortas continuam no mesmo lugar."
+    crumbs={crumbs}
+  >
+    <div class="btn-row btn-row--stack-mobile actions">
+      <a class="btn btn--primary" href={href('/')}>
+        Ir para o início
+      </a>
+      <a class="btn btn--outline" href={href('/cardapio/')}>
+        Ver o cardápio
+      </a>
+      <a
+        class="btn btn--outline"
+        href={whatsappUrl('pedido')}
+        target="_blank"
+        rel="noopener"
+        data-track="whatsapp"
+        data-track-intent="404"
+      >
+        <WhatsAppIcon size={18} />
+        Pedir pelo WhatsApp<span class="sr-only"> (abre em nova aba)</span>
+      </a>
+    </div>
+  </PageHero>
+
+  <section class="section section--tight" aria-labelledby="sugestoes">
+    <div class="container">
+      <h2 class="label" id="sugestoes">
+        Talvez você esteja procurando
+      </h2>
+      <ul class="suggestions">
+        {suggestions.map((s) => (
+          <li>
+            <a class="suggestion" href={href(s.path)}>
+              <span class="icon-dot">
+                <Icon name={s.icon} />
+              </span>
+              <span class="suggestion__text">
+                <span class="suggestion__label">{s.label}</span>
+                <span class="suggestion__desc">{s.text}</span>
+              </span>
+              <Icon name="arrow" class="suggestion__arrow" />
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .actions {
+    margin-top: 30px;
+  }
+  .suggestions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    margin-top: 20px;
+  }
+  .suggestion {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    height: 100%;
+    padding: 20px 22px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--card);
+    transition: border-color 0.25s var(--ease);
+  }
+  .suggestion:hover {
+    border-color: var(--brand);
+  }
+  .suggestion__text {
+    display: grid;
+    gap: 2px;
+    flex: 1;
+  }
+  .suggestion__label {
+    font: 600 17px/1.3 var(--sans);
+  }
+  .suggestion__desc {
+    font-size: 14.5px;
+    color: var(--ink-2);
+  }
+  .suggestion :global(.suggestion__arrow) {
+    color: var(--brand);
+    flex: none;
+    transition: transform 0.25s var(--ease);
+  }
+  .suggestion:hover :global(.suggestion__arrow) {
+    transform: translateX(4px);
+  }
+  @media (max-width: 640px) {
+    .suggestions {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

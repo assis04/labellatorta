@@ -1,0 +1,392 @@
+---
+/**
+ * Política de privacidade (LGPD) fiel ao que este site faz. O trecho de estatísticas acompanha
+ * o build: com PLAUSIBLE_DOMAIN definido, descreve o Plausible ativo; sem ele, diz que não há.
+ */
+import { PLAUSIBLE_DOMAIN } from 'astro:env/server';
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/ui/PageHero.astro';
+import Icon from '../components/ui/Icon.astro';
+import { business, fullAddress } from '../data/business';
+import { href, mailUrl } from '../lib/links';
+
+const title = 'Política de privacidade';
+const description = `Como o site da ${business.name} trata seus dados: sem cookies, sem formulário que envie dados ao site e mapa do Google só após clique. Contato por e-mail.`;
+const crumbs = [
+  { name: 'Início', path: '/' },
+  { name: 'Política de privacidade', path: '/politica-de-privacidade/' },
+];
+const updated = { iso: '2026-11-10', label: '10 de novembro de 2026' };
+const analyticsOn = Boolean(PLAUSIBLE_DOMAIN);
+
+const sections = [
+  { id: 'responsavel', title: 'Quem cuida dos seus dados' },
+  { id: 'cookies', title: 'Cookies' },
+  { id: 'encomendas', title: 'Encomendas e WhatsApp' },
+  { id: 'estatisticas', title: 'Estatísticas de visita' },
+  { id: 'mapa', title: 'Mapa do Google' },
+  { id: 'hospedagem', title: 'Hospedagem do site' },
+  { id: 'links', title: 'Links para outros serviços' },
+  { id: 'direitos', title: 'Seus direitos' },
+  { id: 'alteracoes', title: 'Mudanças nesta política' },
+];
+
+const summary = [
+  'Este site não usa cookies.',
+  'Nenhum formulário envia dados para este site: a encomenda abre o WhatsApp no seu aparelho, e você decide se envia.',
+  analyticsOn
+    ? 'As estatísticas de visita são do Plausible: sem cookies, anônimas e somadas.'
+    : 'Não usamos ferramenta de estatísticas de visita.',
+  'O mapa do Google só carrega se você clicar em “Carregar mapa”.',
+  `Dúvidas ou pedidos sobre seus dados: ${business.email}.`,
+];
+
+const external = (url: string) => ({ href: url, target: '_blank', rel: 'noopener' });
+---
+
+<Base title={title} description={description} path="/politica-de-privacidade/" crumbs={crumbs}>
+  <PageHero
+    label="Privacidade"
+    title="Política de privacidade"
+    lead="Este site foi feito para coletar o mínimo possível. Aqui explicamos, sem juridiquês, o que acontece com os seus dados quando você o visita."
+    crumbs={crumbs}
+  >
+    <p class="updated">
+      <Icon name="calendar" size={16} />
+      Atualizada em <time datetime={updated.iso}>{updated.label}</time>
+    </p>
+  </PageHero>
+
+  <section class="section">
+    <div class="container policy">
+      <nav class="toc" aria-labelledby="toc-titulo">
+        <p class="toc__title" id="toc-titulo">
+          Nesta página
+        </p>
+        <ol>
+          {sections.map((s) => (
+            <li>
+              <a href={`#${s.id}`}>{s.title}</a>
+            </li>
+          ))}
+        </ol>
+      </nav>
+
+      <article class="policy__body">
+        <section class="summary" aria-labelledby="resumo">
+          <h2 class="summary__title" id="resumo">
+            Em resumo
+          </h2>
+          <ul class="summary__list">
+            {summary.map((item) => (
+              <li>
+                <Icon name="check" size={16} />
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        <div class="prose policy__prose">
+          <h2 id="responsavel">Quem cuida dos seus dados</h2>
+          <p>
+            A responsável pelo tratamento dos dados (a “controladora”, na Lei Geral de Proteção de Dados — Lei
+            nº 13.709/2018) é a <strong>{business.name}</strong>, na {fullAddress}. Para qualquer assunto de
+            privacidade, escreva para <a href={mailUrl}>{business.email}</a>.
+          </p>
+
+          <h2 id="cookies">Cookies</h2>
+          <p>
+            Este site não usa cookies, nem nossos nem de outras empresas, e não guarda nada no seu navegador
+            para reconhecer você numa próxima visita. As fontes, as fotos e os scripts vêm do próprio site
+            {analyticsOn ? ', com exceção do script de estatísticas, explicado mais abaixo' : ''}.
+          </p>
+
+          <h2 id="encomendas">Encomendas e WhatsApp</h2>
+          <p>
+            Não existe cadastro nem formulário que envie dados para este site. Na página de{' '}
+            <a href={href('/encomendas/')}>encomendas</a>, a mensagem é montada no seu próprio navegador com o
+            que você escolhe (sabores, quantidade, data, retirada ou entrega, nome e observações). Esses dados
+            não passam pelo site nem ficam guardados aqui: o botão apenas abre o WhatsApp no seu aparelho com
+            o texto pronto, e você decide se envia.
+          </p>
+          <p>
+            Quando você manda uma mensagem para o nosso WhatsApp, usamos o que você escreveu — como nome,
+            pedido e, se for o caso, endereço de entrega — para responder e atender o seu pedido (art. 7º, V,
+            da LGPD). A conversa também segue a{' '}
+            <a {...external('https://www.whatsapp.com/legal/privacy-policy')}>
+              política de privacidade do WhatsApp
+            </a>
+            .
+          </p>
+
+          <h2 id="estatisticas">Estatísticas de visita</h2>
+          {analyticsOn ? (
+            <>
+              <p>
+                Para saber quantas pessoas visitam o site e quais páginas são mais vistas, usamos o{' '}
+                <a {...external('https://plausible.io/data-policy')}>Plausible Analytics</a>. Ele não usa
+                cookies, não guarda o seu endereço IP e não acompanha você em outros sites.
+              </p>
+              <p>
+                Os números são anônimos e somados: visitas, páginas vistas, site de origem, país e tipo de
+                aparelho. Também contamos os cliques nos botões do WhatsApp e do mapa, sem saber quem clicou.
+              </p>
+            </>
+          ) : (
+            <p>
+              No momento, este site não usa nenhuma ferramenta de estatísticas. Se passarmos a usar, será o{' '}
+              <a {...external('https://plausible.io/data-policy')}>Plausible Analytics</a>, que não usa
+              cookies e só registra números anônimos e somados — e esta página será atualizada.
+            </p>
+          )}
+
+          <h2 id="mapa">Mapa do Google</h2>
+          <p>
+            Nas páginas com mapa, como a de <a href={href('/contato/')}>contato</a>, ele começa como uma
+            ilustração. O Google Maps só é carregado se você clicar em “Carregar mapa”. A partir daí, o Google
+            pode coletar dados de navegação, como o endereço IP, e usar cookies, conforme a{' '}
+            <a {...external('https://policies.google.com/privacy')}>política de privacidade do Google</a>.
+          </p>
+
+          <h2 id="hospedagem">Hospedagem do site</h2>
+          <p>
+            O site é publicado no GitHub Pages. Como acontece em qualquer servidor, o GitHub registra o
+            endereço IP de quem acessa as páginas, por motivo de segurança, conforme a{' '}
+            <a
+              {...external(
+                'https://docs.github.com/site-policy/privacy-policies/github-general-privacy-statement',
+              )}
+            >
+              declaração de privacidade do GitHub
+            </a>
+            . Nós não temos acesso a esses registros.
+          </p>
+
+          <h2 id="links">Links para outros serviços</h2>
+          <p>
+            Os botões de WhatsApp, Instagram, Facebook, Google Maps e Waze levam para fora deste site. Ao
+            abrir esses links, quem trata os seus dados é o serviço de destino, de acordo com a política de
+            privacidade dele:
+          </p>
+          <ul>
+            <li>
+              <a {...external('https://www.whatsapp.com/legal/privacy-policy')}>WhatsApp</a>
+            </li>
+            <li>
+              <a {...external('https://privacycenter.instagram.com/policy')}>Instagram</a>
+            </li>
+            <li>
+              <a {...external('https://www.facebook.com/privacy/policy')}>Facebook</a>
+            </li>
+            <li>
+              <a {...external('https://policies.google.com/privacy')}>Google Maps</a>
+            </li>
+            <li>
+              <a {...external('https://www.waze.com/legal/privacy')}>Waze</a>
+            </li>
+          </ul>
+
+          <h2 id="direitos">Seus direitos</h2>
+          <p>Pela LGPD (art. 18), você pode pedir a qualquer momento, sem custo:</p>
+          <ul>
+            <li>a confirmação de que tratamos dados seus e o acesso a eles;</li>
+            <li>a correção de dados incompletos, errados ou desatualizados;</li>
+            <li>a anonimização, o bloqueio ou a exclusão de dados desnecessários;</li>
+            <li>a portabilidade dos dados e a informação sobre com quem eles foram compartilhados;</li>
+            <li>a exclusão de dados tratados com o seu consentimento e a revogação desse consentimento.</li>
+          </ul>
+          <p>
+            É só escrever para <a href={mailUrl}>{business.email}</a>. Você também pode reclamar à{' '}
+            <a {...external('https://www.gov.br/anpd/')}>Autoridade Nacional de Proteção de Dados (ANPD)</a>.
+          </p>
+
+          <h2 id="alteracoes">Mudanças nesta política</h2>
+          <p>
+            Se o site passar a tratar dados de outro jeito, esta página será atualizada antes, com a nova data
+            no topo.
+          </p>
+        </div>
+
+        <div class="policy__end">
+          <p>Ficou alguma dúvida sobre os seus dados?</p>
+          <div class="btn-row btn-row--stack-mobile">
+            <a class="btn btn--primary" href={mailUrl}>
+              <Icon name="mail" />
+              Escrever para {business.email}
+            </a>
+            <a class="btn btn--outline" href={href('/')}>
+              Voltar ao início
+            </a>
+          </div>
+        </div>
+      </article>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .updated {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 22px;
+    font-size: 14px;
+    color: var(--ink-2);
+  }
+  .updated :global(svg) {
+    color: var(--brand);
+  }
+
+  .policy {
+    display: grid;
+    grid-template-columns: 240px minmax(0, 1fr);
+    gap: 72px;
+    align-items: start;
+  }
+
+  /* ---------- índice ---------- */
+  .toc {
+    position: sticky;
+    top: calc(var(--header-h) + 24px);
+  }
+  .toc__title {
+    font: 500 11px/1.3 var(--sans);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--brand);
+  }
+  .toc ol {
+    margin-top: 12px;
+    border-left: 1px solid var(--line);
+  }
+  .toc a {
+    display: block;
+    padding: 8px 0 8px 16px;
+    margin-left: -1px;
+    border-left: 1px solid transparent;
+    font-size: 14px;
+    line-height: 1.4;
+    color: var(--ink-2);
+    transition:
+      color 0.25s var(--ease),
+      border-color 0.25s var(--ease);
+  }
+  .toc a:hover {
+    color: var(--brand);
+    border-left-color: var(--brand);
+  }
+
+  /* ---------- resumo ---------- */
+  .policy__body {
+    max-width: 720px;
+  }
+  .summary {
+    padding: 28px 30px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--bg-alt);
+  }
+  .summary__title {
+    font: 500 28px/1.2 var(--serif);
+  }
+  .summary__list {
+    display: grid;
+    gap: 12px;
+    margin-top: 18px;
+  }
+  .summary__list li {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    font-size: 15.5px;
+    line-height: 1.6;
+  }
+  .summary__list :global(svg) {
+    margin-top: 4px;
+    color: var(--brand);
+  }
+
+  /* ---------- texto ---------- */
+  .policy__prose {
+    max-width: none;
+    margin-top: 48px;
+  }
+  .policy__prose h2 {
+    margin-top: 2.2em;
+    font: 500 28px/1.2 var(--serif);
+    color: var(--ink);
+    scroll-margin-top: calc(var(--header-h) + 24px);
+  }
+  .policy__prose h2:first-child {
+    margin-top: 0;
+  }
+  .policy__prose h2 + p {
+    margin-top: 0.7em;
+  }
+  .policy__prose a {
+    color: var(--brand);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .policy__prose ul {
+    display: grid;
+    gap: 8px;
+  }
+  .policy__prose li {
+    position: relative;
+    padding-left: 20px;
+  }
+  .policy__prose li::before {
+    content: '';
+    position: absolute;
+    left: 2px;
+    top: 0.72em;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--brand);
+  }
+  .policy__end {
+    margin-top: 56px;
+    padding-top: 32px;
+    border-top: 1px solid var(--line);
+  }
+  .policy__end p {
+    font: 500 24px/1.3 var(--serif);
+    margin-bottom: 18px;
+  }
+  .policy__end .btn {
+    white-space: normal;
+  }
+
+  @media (max-width: 960px) {
+    .policy {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 40px;
+    }
+    .toc {
+      position: static;
+    }
+    .toc ol {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0 16px;
+      border-left: 0;
+    }
+    .toc a {
+      padding: 10px 0;
+      margin-left: 0;
+      border-left: 0;
+      border-bottom: 1px solid var(--line);
+    }
+  }
+  @media (max-width: 560px) {
+    .toc ol {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .summary {
+      padding: 24px 20px;
+    }
+  }
+</style>

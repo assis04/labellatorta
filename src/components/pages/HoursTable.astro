@@ -1,0 +1,70 @@
+---
+/**
+ * Tabela de horários (segunda a domingo). Cada linha leva `data-hours-days`; o script global
+ * marca a linha de hoje com `data-today`, no fuso de São Paulo, e ela ganha destaque.
+ */
+import { openingHours } from '../../data/business';
+import { hoursTable } from '../../lib/hours';
+
+interface Props {
+  caption?: string;
+  class?: string;
+}
+const { caption = 'Horário de funcionamento', class: className } = Astro.props;
+const rows = hoursTable(openingHours);
+---
+
+<table class:list={['hours', className]}>
+  <caption class="sr-only">{caption}</caption>
+  <tbody>
+    {rows.map((row) => (
+      <tr data-hours-days={row.days.join(',')}>
+        <th scope="row">{row.label}</th>
+        <td>{row.value}</td>
+      </tr>
+    ))}
+  </tbody>
+</table>
+
+<style>
+  .hours {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 15px;
+  }
+  .hours th,
+  .hours td {
+    padding: 13px 0;
+    border-top: 1px solid var(--line);
+    font-weight: 400;
+    color: var(--ink-2);
+    text-align: left;
+    vertical-align: middle;
+  }
+  .hours td {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .hours tr:last-child th,
+  .hours tr:last-child td {
+    border-bottom: 1px solid var(--line);
+  }
+  .hours tr[data-today] th,
+  .hours tr[data-today] td {
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .hours tr[data-today] th::after {
+    content: 'hoje';
+    display: inline-block;
+    margin-left: 10px;
+    padding: 3px 9px;
+    border-radius: 999px;
+    background: var(--brand-50);
+    color: var(--brand);
+    font: 500 11px/1.2 var(--sans);
+    letter-spacing: 0.04em;
+    vertical-align: 1px;
+  }
+</style>

@@ -1,0 +1,233 @@
+---
+/**
+ * "Nossa casa": card com foto do salão, status em tempo real, endereço, tabela de horários
+ * (o dia de hoje é marcado pelo site.ts via data-hours-days → data-today) e o mapa sob demanda.
+ */
+import { Picture } from 'astro:assets';
+import Icon from '../ui/Icon.astro';
+import MapFacade from '../ui/MapFacade.astro';
+import OpenStatus from '../ui/OpenStatus.astro';
+import SectionHead from '../ui/SectionHead.astro';
+import WhatsAppIcon from '../ui/WhatsAppIcon.astro';
+import salaoPhoto from '../../assets/fotos/almoco-salao.jpg';
+import { business, fullAddress, links, openingHours } from '../../data/business';
+import { hoursTable } from '../../lib/hours';
+import { whatsappUrl } from '../../lib/links';
+
+const { address } = business;
+const rows = hoursTable(openingHours);
+---
+
+<section class="section" aria-labelledby="casa-title">
+  <div class="container">
+    <SectionHead
+      label="Venha nos visitar"
+      title={`Nossa casa no ${address.neighborhood}`}
+      subtitle={`Na região do ${address.district}, Zona Leste de ${address.city}.`}
+      id="casa-title"
+    />
+
+    <div class="visit">
+      <article class="unit" data-reveal>
+        <div class="unit__img">
+          <Picture
+            src={salaoPhoto}
+            alt={`Mesa no salão da ${business.name} com um prato de torta e salada, vasinho de planta e porta-guardanapos`}
+            formats={['avif', 'webp']}
+            widths={[400, 640, 960]}
+            width={960}
+            sizes="(max-width: 900px) calc(100vw - 40px), 520px"
+          />
+          <span class="unit__status">
+            <OpenStatus />
+          </span>
+        </div>
+
+        <div class="unit__body">
+          <h3 class="h3">
+            {business.name} · {address.neighborhood}
+          </h3>
+          <address class="unit__addr">
+            <Icon name="pin" />
+            {fullAddress}
+          </address>
+
+          <table class="hours">
+            <caption class="sr-only">Horário de funcionamento</caption>
+            <tbody>
+              {rows.map((row) => (
+                <tr data-hours-days={row.days.join(',')}>
+                  <th scope="row">{row.label}</th>
+                  <td>{row.value}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          <div class="unit__ctas">
+            <a
+              class="btn btn--primary"
+              href={links.googleMaps}
+              target="_blank"
+              rel="noopener"
+              data-track="mapa"
+              data-track-intent="home-como-chegar"
+            >
+              <Icon name="navigation" />
+              Como chegar
+            </a>
+            <a
+              class="btn btn--outline"
+              href={whatsappUrl('pedido')}
+              target="_blank"
+              rel="noopener"
+              data-track="whatsapp"
+              data-track-intent="home-casa"
+            >
+              <WhatsAppIcon size={18} />
+              WhatsApp
+            </a>
+          </div>
+        </div>
+      </article>
+
+      <div class="visit__map" data-reveal>
+        <MapFacade />
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .visit {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
+    gap: 28px;
+    margin-top: 52px;
+    align-items: stretch;
+  }
+
+  .unit {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--card);
+  }
+  .unit__img {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    background: var(--bg-alt);
+  }
+  .unit__img :global(picture),
+  .unit__img :global(img) {
+    width: 100%;
+    height: 100%;
+  }
+  .unit__img :global(img) {
+    object-fit: cover;
+    object-position: 50% 62%;
+  }
+  .unit__status {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    padding: 7px 12px;
+    border-radius: 999px;
+    background: rgba(43, 37, 34, 0.82);
+    color: #fff;
+    font: 500 12px/1.2 var(--sans);
+  }
+  .unit__status :global(.status-dot) {
+    background: #6fcf7f;
+    box-shadow: 0 0 0 3px rgba(111, 207, 127, 0.25);
+  }
+  .unit__status :global([data-open='false'] .status-dot) {
+    background: #e0715b;
+    box-shadow: 0 0 0 3px rgba(224, 113, 91, 0.25);
+  }
+
+  .unit__body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    padding: 24px 24px 26px;
+  }
+  .unit__addr {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-top: 8px;
+    font-size: 14.5px;
+    font-style: normal;
+    line-height: 1.5;
+    color: var(--ink-2);
+  }
+  .unit__addr :global(svg) {
+    flex: none;
+    margin-top: 2px;
+    color: var(--brand);
+  }
+
+  .hours {
+    width: 100%;
+    margin-top: 18px;
+    border-collapse: collapse;
+    font-size: 14.5px;
+  }
+  .hours th,
+  .hours td {
+    padding: 9px 0;
+    border-top: 1px solid var(--line);
+    color: var(--ink-2);
+    font-weight: 400;
+    text-align: left;
+  }
+  .hours td {
+    text-align: right;
+  }
+  .hours tr[data-today] th,
+  .hours tr[data-today] td {
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .hours tr[data-today] th::after {
+    content: 'hoje';
+    display: inline-block;
+    margin-left: 8px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: var(--brand-50);
+    color: var(--brand);
+    font: 500 11px/1.4 var(--sans);
+    vertical-align: 1px;
+  }
+
+  .unit__ctas {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: auto;
+    padding-top: 22px;
+  }
+  .unit__ctas .btn {
+    padding: 0 16px;
+  }
+
+  .visit__map {
+    display: grid;
+  }
+
+  @media (max-width: 900px) {
+    .visit {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  @media (max-width: 380px) {
+    .unit__ctas {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

@@ -1,0 +1,234 @@
+---
+/**
+ * Página de cada sabor (/tortas/<slug>/), gerada a partir de src/data/menu.ts.
+ * Topo dividido (fotos + compra), "Como é a nossa torta", outros sabores e chamada de encomenda.
+ * Schema: MenuItem (sem Offer enquanto o preço for null) + BreadcrumbList via `crumbs`.
+ */
+import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
+import Base from '../../layouts/Base.astro';
+import Breadcrumbs from '../../components/ui/Breadcrumbs.astro';
+import CtaBand from '../../components/ui/CtaBand.astro';
+import Icon from '../../components/ui/Icon.astro';
+import SectionHead from '../../components/ui/SectionHead.astro';
+import TortaCard from '../../components/ui/TortaCard.astro';
+import Gallery from '../../components/menu/Gallery.astro';
+import TortaFacts from '../../components/menu/TortaFacts.astro';
+import TortaOrder from '../../components/menu/TortaOrder.astro';
+import { inSentence, tortaDescription, tortaTitle } from '../../components/menu/meta';
+import { relatedTortas } from '../../components/menu/related';
+import { schemaContext, schemaImageUrl } from '../../components/menu/structured-data';
+import { business } from '../../data/business';
+import type { TortaTag } from '../../data/menu';
+import { tagLabels, tortas } from '../../data/menu';
+import { href } from '../../lib/links';
+import { menuItemSchema, type Crumb } from '../../lib/schema';
+
+export const getStaticPaths = (() =>
+  tortas.map((torta) => ({ params: { slug: torta.slug }, props: { torta } }))) satisfies GetStaticPaths;
+
+type Props = InferGetStaticPropsType<typeof getStaticPaths>;
+
+const { torta } = Astro.props;
+const path = `/tortas/${torta.slug}/`;
+const crumbs: Crumb[] = [
+  { name: 'Início', path: '/' },
+  { name: 'Cardápio', path: '/cardapio/' },
+  { name: torta.name, path },
+];
+
+const { title, fullTitle } = tortaTitle(torta);
+const description = tortaDescription(torta);
+const imageUrl = await schemaImageUrl(torta.photo.src, Astro.site);
+const schema = [
+  { '@context': 'https://schema.org', ...menuItemSchema(torta, schemaContext(Astro.site), imageUrl) },
+];
+
+const categoryLabel = torta.category === 'salgada' ? 'Torta salgada' : 'Torta doce';
+const badgeClass: Record<TortaTag, string> = { vegetariana: 'badge--veg', 'versao-apimentada': 'badge--hot' };
+const related = relatedTortas(torta);
+---
+
+<Base
+  title={title}
+  fullTitle={fullTitle}
+  description={description}
+  path={path}
+  shareImage={torta.photo.src}
+  shareImageAlt={torta.photo.alt}
+  schema={schema}
+  crumbs={crumbs}
+>
+  <section class="sabor" aria-labelledby="sabor-title">
+    <div class="container">
+      <Breadcrumbs crumbs={crumbs} />
+      <div class="sabor__grid">
+        <div class="sabor__media">
+          <Gallery photos={[torta.photo, ...torta.gallery]} idPrefix={torta.slug} />
+        </div>
+
+        <div class="sabor__info">
+          <span class="label">{categoryLabel}</span>
+          <h1 class="h1 sabor__title" id="sabor-title">
+            {torta.name}
+          </h1>
+          {torta.tags.length > 0 && (
+            <ul class="sabor__tags" aria-label="Selos">
+              {torta.tags.map((tag) => (
+                <li class:list={['badge', badgeClass[tag]]}>{tagLabels[tag]}</li>
+              ))}
+            </ul>
+          )}
+          <p class="sabor__desc">{torta.description}</p>
+
+          <h2 class="sabor__subhead">O que vai na torta</h2>
+          <ul class="sabor__ingredients">
+            {torta.ingredients.map((item) => (
+              <li>
+                <Icon name="check" class="sabor__check" />
+                {item}
+              </li>
+            ))}
+          </ul>
+
+          <TortaOrder torta={torta} />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <TortaFacts torta={torta} />
+
+  <section class="section" aria-labelledby="outros-title">
+    <div class="container">
+      <SectionHead label="Cardápio" title="Outros sabores" id="outros-title" align="left" />
+      <div class="sabor__related">
+        {related.map((t) => (
+          <TortaCard torta={t} headingLevel="h3" />
+        ))}
+      </div>
+      <div class="sabor__more">
+        <a class="btn btn--outline" href={href('/cardapio/')}>
+          Ver o cardápio completo
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <CtaBand
+    title="Encomende a torta inteira"
+    text={`A ${inSentence(torta.name)} também sai inteira. Diga o dia pelo WhatsApp ${business.phone.display} e a gente combina a retirada ou a entrega.`}
+    intent="encomenda"
+    buttonLabel="Encomendar pelo WhatsApp"
+  />
+</Base>
+
+<style>
+  .sabor {
+    padding: calc(var(--header-h) + 28px) 0 96px;
+  }
+  .sabor__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    gap: 64px;
+    align-items: start;
+    margin-top: 24px;
+  }
+  .sabor__media {
+    position: sticky;
+    top: calc(var(--header-h) + 24px);
+  }
+  .sabor__info {
+    padding-top: 8px;
+  }
+  .sabor__title {
+    margin-top: 12px;
+  }
+  .sabor__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 16px;
+  }
+  .sabor__desc {
+    margin-top: 18px;
+    font-size: 16.5px;
+    line-height: 1.75;
+    color: var(--ink-2);
+    max-width: 58ch;
+    text-wrap: pretty;
+  }
+  .sabor__subhead {
+    margin-top: 30px;
+    font: 500 11px/1.3 var(--sans);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+  .sabor__ingredients {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px 24px;
+    margin-top: 14px;
+    font-size: 15px;
+  }
+  .sabor__ingredients li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .sabor__ingredients :global(.sabor__check) {
+    flex: none;
+    margin-top: 4px;
+    color: var(--brand);
+  }
+  .sabor__related {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 44px 28px;
+    margin-top: 44px;
+  }
+  .sabor__more {
+    display: flex;
+    justify-content: center;
+    margin-top: 52px;
+  }
+
+  @media (max-width: 1100px) {
+    .sabor__grid {
+      gap: 48px;
+    }
+  }
+  @media (max-width: 959px) {
+    .sabor {
+      padding-bottom: 72px;
+    }
+    .sabor__grid {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 32px;
+      margin-top: 20px;
+    }
+    .sabor__media {
+      position: static;
+    }
+    .sabor__info {
+      padding-top: 0;
+    }
+  }
+  @media (max-width: 900px) {
+    .sabor__related {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  /* Em duas colunas, o terceiro card ficaria sozinho na linha. */
+  @media (min-width: 561px) and (max-width: 900px) {
+    .sabor__related > :global(:nth-child(3)) {
+      display: none;
+    }
+  }
+  @media (max-width: 560px) {
+    .sabor__related,
+    .sabor__ingredients {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

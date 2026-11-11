@@ -1,0 +1,42 @@
+---
+import WhatsAppIcon from './WhatsAppIcon.astro';
+import { whatsappUrl } from '../../lib/links';
+---
+
+<a
+  class="wa-fab"
+  href={whatsappUrl('pedido')}
+  target="_blank"
+  rel="noopener"
+  aria-label="Pedir pelo WhatsApp"
+  data-track="whatsapp"
+  data-track-intent="flutuante"
+>
+  <WhatsAppIcon size={30} />
+</a>
+
+<style>
+  .wa-fab {
+    position: fixed;
+    right: max(20px, env(safe-area-inset-right));
+    bottom: max(20px, env(safe-area-inset-bottom));
+    z-index: var(--z-fab);
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    background: var(--whatsapp);
+    color: #fff;
+    display: grid;
+    place-items: center;
+    box-shadow:
+      0 10px 28px -8px rgba(37, 211, 102, 0.55),
+      0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: transform 0.2s var(--ease);
+  }
+  .wa-fab:hover {
+    transform: scale(1.05);
+  }
+  :global(html.menu-open) .wa-fab {
+    display: none;
+  }
+</style>

@@ -1,0 +1,7 @@
+/dist
+.astro
+node_modules
+.agent-builds
+package-lock.json
+src/assets
+public

@@ -1,0 +1,184 @@
+---
+import { Picture } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/ui/PageHero.astro';
+import CtaBand from '../components/ui/CtaBand.astro';
+import FactList from '../components/pages/FactList.astro';
+import OrderForm from '../components/pages/OrderForm.astro';
+import Steps from '../components/pages/Steps.astro';
+import { business } from '../data/business';
+import { doces, salgadas, tortas } from '../data/menu';
+import { href } from '../lib/links';
+import fotoCaixa from '../assets/fotos/encomenda-caixa.jpg';
+import fotoInteira from '../assets/fotos/torta-inteira-gratinada.jpg';
+
+const title = 'Encomendas de tortas inteiras';
+const description =
+  'Encomende torta inteira na La Bella Torta, no Parque São Jorge: escolha sabores, quantidade, data e retirada ou entrega. A mensagem sai pronta no WhatsApp.';
+const crumbs = [
+  { name: 'Início', path: '/' },
+  { name: 'Encomendas', path: '/encomendas/' },
+];
+
+const steps = [
+  {
+    title: 'Monte o pedido',
+    text: 'Escolha os sabores, quantas tortas de cada, a data e se vai retirar na loja ou receber em casa.',
+  },
+  {
+    title: 'Envie pelo WhatsApp',
+    text: 'O botão abre o WhatsApp com a mensagem pronta. Você confere o texto e envia para a gente.',
+  },
+  {
+    title: 'A gente confirma',
+    text: 'Respondemos por lá para confirmar a encomenda e combinar os detalhes da retirada ou da entrega.',
+  },
+];
+---
+
+<Base
+  title={title}
+  description={description}
+  path="/encomendas/"
+  crumbs={crumbs}
+  shareImage={fotoCaixa}
+  shareImageAlt="Torta inteira sendo colocada na caixa de papel kraft da La Bella Torta"
+>
+  <PageHero
+    label="Encomendas"
+    title="Encomende sua torta inteira"
+    lead={`Os ${tortas.length} sabores do cardápio, salgados e doces, podem ser encomendados inteiros. Monte o pedido aqui embaixo e a mensagem sai pronta para o nosso WhatsApp.`}
+    crumbs={crumbs}
+  >
+    <div class="hero-facts">
+      <FactList
+        items={[
+          { icon: 'list', text: `${salgadas.length} sabores salgados e ${doces.length} doces` },
+          { icon: 'bag', text: 'Retirada na loja ou entrega' },
+          { icon: 'chat', text: `Confirmação pelo WhatsApp ${business.phone.display}` },
+        ]}
+      />
+    </div>
+  </PageHero>
+
+  <section class="section order-section" id="monte" aria-labelledby="monte-titulo">
+    <div class="container">
+      <header class="order-head">
+        <span class="label">Passo a passo</span>
+        <h2 class="h2" id="monte-titulo">
+          Monte sua encomenda
+        </h2>
+        <p class="order-head__sub">
+          Nada é enviado por este site: o botão abre o WhatsApp no seu aparelho com o texto pronto, e você
+          confere antes de mandar.
+        </p>
+      </header>
+      <OrderForm />
+    </div>
+  </section>
+
+  <section class="section section--alt" aria-labelledby="como-funciona">
+    <div class="container">
+      <header class="how-head" data-reveal>
+        <span class="label">Como funciona</span>
+        <h2 class="h2" id="como-funciona">
+          Da escolha à confirmação, em três passos
+        </h2>
+      </header>
+      <div class="how-steps">
+        <Steps steps={steps} layout="row" />
+      </div>
+
+      <div class="how-photos" data-reveal>
+        <figure class="photo how-photos__main">
+          <Picture
+            src={fotoCaixa}
+            alt="Torta inteira gratinada sendo colocada na caixa de papel kraft com a marca da La Bella Torta"
+            formats={['avif', 'webp']}
+            widths={[480, 720, 1000, 1380]}
+            width={1380}
+            sizes="(max-width: 760px) calc(100vw - 40px), (max-width: 1248px) 57vw, 690px"
+            loading="lazy"
+            decoding="async"
+          />
+        </figure>
+        <figure class="photo how-photos__side">
+          <Picture
+            src={fotoInteira}
+            alt="Torta inteira com a cobertura de creme de queijo gratinada, vista de cima sobre uma base rendada"
+            formats={['avif', 'webp']}
+            widths={[400, 640, 980]}
+            width={980}
+            sizes="(max-width: 760px) calc(100vw - 40px), (max-width: 1248px) 40vw, 490px"
+            loading="lazy"
+            decoding="async"
+          />
+        </figure>
+      </div>
+
+      <div class="btn-row btn-row--stack-mobile how-actions">
+        <a class="btn btn--primary" href="#monte">
+          Montar minha encomenda
+        </a>
+        <a class="btn btn--outline" href={href('/cardapio/')}>
+          Ver o cardápio
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <CtaBand
+    title="Prefere conversar direto?"
+    text={`Chame no WhatsApp ${business.phone.display} e conte o sabor, a quantidade e o dia que você precisa.`}
+    intent="encomenda"
+    buttonLabel="Encomendar pelo WhatsApp"
+  />
+</Base>
+
+<style>
+  .hero-facts {
+    margin-top: 24px;
+  }
+  .order-head {
+    max-width: 640px;
+    margin-bottom: 48px;
+  }
+  .order-head .h2 {
+    margin-top: 12px;
+  }
+  .order-head__sub {
+    margin-top: 12px;
+    color: var(--ink-2);
+  }
+  .how-head .h2 {
+    margin-top: 12px;
+    max-width: 20ch;
+  }
+  .how-steps {
+    margin-top: 44px;
+  }
+  .how-photos {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    gap: 20px;
+    margin-top: 56px;
+    height: clamp(260px, 34vw, 440px);
+  }
+  .how-photos .photo {
+    height: 100%;
+  }
+  .how-actions {
+    margin-top: 40px;
+  }
+  @media (max-width: 760px) {
+    .how-photos {
+      grid-template-columns: minmax(0, 1fr);
+      height: auto;
+      gap: 12px;
+    }
+    .how-photos .photo {
+      height: auto;
+      aspect-ratio: 3 / 2;
+    }
+  }
+</style>

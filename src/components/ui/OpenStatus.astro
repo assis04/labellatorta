@@ -1,0 +1,33 @@
+---
+/**
+ * "Aberto agora / Fechado" em tempo real. O HTML estático traz os horários (funciona sem JS),
+ * gerados de `openingHours`; o script do site troca pelo status calculado no fuso de São Paulo.
+ */
+import { openingHours } from '../../data/business';
+import { hoursTable } from '../../lib/hours';
+
+interface Props {
+  class?: string;
+}
+const { class: className } = Astro.props;
+const fallback = hoursTable(openingHours)
+  .filter((row) => row.value !== 'Fechado')
+  .map((row) => `${row.label} ${row.value}`)
+  .join(' · ');
+---
+
+<span class:list={['open-status', className]} data-open-status>
+  <span class="status-dot" aria-hidden="true"></span>
+  <span data-open-status-label>{fallback}</span>
+</span>
+
+<style>
+  .open-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .open-status:not([data-open]) .status-dot {
+    display: none;
+  }
+</style>

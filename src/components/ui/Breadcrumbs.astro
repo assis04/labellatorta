@@ -1,0 +1,51 @@
+---
+/** Trilha de navegação visível. O schema BreadcrumbList é emitido pela página via layout. */
+import type { Crumb } from '../../lib/schema';
+import { href } from '../../lib/links';
+
+interface Props {
+  crumbs: readonly Crumb[];
+  tone?: 'dark' | 'light';
+}
+const { crumbs, tone = 'dark' } = Astro.props;
+---
+
+<nav class:list={['crumbs', `crumbs--${tone}`]} aria-label="Você está em">
+  <ol>
+    {crumbs.map((c, i) => (
+      <li>
+        {i < crumbs.length - 1 ? (
+          <a href={href(c.path)}>{c.name}</a>
+        ) : (
+          <span aria-current="page">{c.name}</span>
+        )}
+      </li>
+    ))}
+  </ol>
+</nav>
+
+<style>
+  .crumbs ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-size: 13px;
+  }
+  .crumbs li + li::before {
+    content: '/';
+    margin-right: 6px;
+    opacity: 0.5;
+  }
+  .crumbs--dark {
+    color: var(--ink-3);
+  }
+  .crumbs--dark a:hover {
+    color: var(--brand);
+  }
+  .crumbs--light {
+    color: rgba(255, 255, 255, 0.8);
+  }
+  .crumbs--light a:hover {
+    color: #fff;
+  }
+</style>

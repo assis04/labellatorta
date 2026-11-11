@@ -1,0 +1,102 @@
+---
+/** Lista compacta de sabores (miniatura, nome e resumo), cada linha leva à página do sabor. */
+import { Picture } from 'astro:assets';
+import Icon from '../ui/Icon.astro';
+import type { Torta } from '../../data/menu';
+import { href } from '../../lib/links';
+
+interface Props {
+  tortas: readonly Torta[];
+}
+
+const { tortas } = Astro.props;
+---
+
+<ul class="tlist">
+  {tortas.map((torta) => (
+    <li>
+      <a class="tlist__link" href={href(`/tortas/${torta.slug}/`)}>
+        <span class="tlist__img photo">
+          <Picture
+            src={torta.photo.src}
+            alt=""
+            formats={['avif', 'webp']}
+            widths={[88, 176]}
+            width={176}
+            height={176}
+            fit="cover"
+            sizes="88px"
+            loading="lazy"
+            decoding="async"
+          />
+        </span>
+        <span class="tlist__text">
+          <span class="tlist__name">{torta.name}</span>
+          <span class="tlist__summary">{torta.summary}</span>
+        </span>
+        <Icon name="arrow" class="tlist__arrow" />
+      </a>
+    </li>
+  ))}
+</ul>
+
+<style>
+  .tlist {
+    border-top: 1px solid var(--line);
+  }
+  .tlist li {
+    border-bottom: 1px solid var(--line);
+  }
+  .tlist__link {
+    display: grid;
+    grid-template-columns: 88px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 20px;
+    padding: 18px 4px;
+  }
+  .tlist__img {
+    width: 88px;
+    height: 88px;
+    border-radius: var(--radius-sm);
+  }
+  .tlist__img :global(picture) {
+    height: 100%;
+  }
+  .tlist__text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .tlist__name {
+    font: 600 17px/1.3 var(--sans);
+    transition: color 0.25s var(--ease);
+  }
+  .tlist__summary {
+    font-size: 14.5px;
+    line-height: 1.55;
+    color: var(--ink-2);
+  }
+  .tlist__link :global(.tlist__arrow) {
+    color: var(--brand);
+    transition: transform 0.25s var(--ease);
+  }
+  .tlist__link:hover .tlist__name {
+    color: var(--brand);
+  }
+  .tlist__link:hover :global(.tlist__arrow) {
+    transform: translateX(4px);
+  }
+  @media (max-width: 560px) {
+    .tlist__link {
+      grid-template-columns: 72px minmax(0, 1fr);
+      gap: 16px;
+    }
+    .tlist__img {
+      width: 72px;
+      height: 72px;
+    }
+    .tlist__link :global(.tlist__arrow) {
+      display: none;
+    }
+  }
+</style>

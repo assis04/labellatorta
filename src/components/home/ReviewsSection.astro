@@ -1,0 +1,230 @@
+---
+/**
+ * Avaliações. Mostra cards somente com avaliações reais (`reviews` em content.ts, copiadas do
+ * Google com autorização). Enquanto a lista estiver vazia, mostra um convite para ler as
+ * avaliações no Google. Nunca inventa depoimento, nota média ou número de avaliações.
+ */
+import Icon from '../ui/Icon.astro';
+import SectionHead from '../ui/SectionHead.astro';
+import { business, links, TIMEZONE } from '../../data/business';
+import { reviews, type Review } from '../../data/content';
+
+interface Props {
+  /** Padrão: `reviews` de content.ts. Só existe para testar o estado com avaliações. */
+  items?: readonly Review[];
+}
+const { items = reviews } = Astro.props;
+
+const MAX_CARDS = 3;
+const shown = items.slice(0, MAX_CARDS);
+const hasReviews = shown.length > 0;
+
+const monthYear = new Intl.DateTimeFormat('pt-BR', { month: 'long', year: 'numeric', timeZone: TIMEZONE });
+const formatDate = (iso: string) => monthYear.format(new Date(iso));
+const initial = (name: string) => name.trim().charAt(0).toLocaleUpperCase('pt-BR');
+const STARS = [1, 2, 3, 4, 5] as const;
+---
+
+<section class="section" aria-labelledby="avaliacoes-title">
+  <div class="container">
+    <SectionHead
+      label="Quem prova, pede bis"
+      title="O que dizem nossos clientes"
+      subtitle={
+        hasReviews
+          ? 'Avaliações reais, publicadas no nosso perfil do Google.'
+          : `As avaliações da ${business.name} estão no Google, escritas por quem já provou.`
+      }
+      id="avaliacoes-title"
+    />
+
+    {hasReviews ? (
+      <>
+        <ul class="reviews">
+          {shown.map((review) => (
+            <li class="review" data-reveal>
+              <figure class="review__figure">
+                <span class="review__stars" role="img" aria-label={`Nota ${review.rating} de 5`}>
+                  {STARS.map((n) => (
+                    <span class:list={['review__star', { 'is-on': n <= review.rating }]}>
+                      <Icon name="star" size={16} />
+                    </span>
+                  ))}
+                </span>
+                <blockquote class="review__text">
+                  <p>{review.text}</p>
+                </blockquote>
+                <figcaption class="review__author">
+                  <span class="review__avatar" aria-hidden="true">
+                    {initial(review.author)}
+                  </span>
+                  <span>
+                    <strong>{review.author}</strong>
+                    via {review.source} · <time datetime={review.date}>{formatDate(review.date)}</time>
+                  </span>
+                </figcaption>
+              </figure>
+            </li>
+          ))}
+        </ul>
+        <div class="reviews__more">
+          <a
+            class="btn btn--outline"
+            href={links.googleReviews}
+            target="_blank"
+            rel="noopener"
+            data-track="avaliacoes"
+            data-track-intent="home"
+          >
+            Ver todas no Google
+            <span class="sr-only"> (abre em nova aba)</span>
+          </a>
+        </div>
+      </>
+    ) : (
+      <div class="invite" data-reveal>
+        <span class="icon-dot invite__icon">
+          <Icon name="chat" size={22} />
+        </span>
+        <p class="invite__text">Leia o que dizem antes de pedir. E, se você já provou, conte lá como foi.</p>
+        <a
+          class="btn btn--primary"
+          href={links.googleReviews}
+          target="_blank"
+          rel="noopener"
+          data-track="avaliacoes"
+          data-track-intent="home"
+        >
+          <Icon name="star" />
+          Ver avaliações no Google
+          <span class="sr-only"> (abre em nova aba)</span>
+        </a>
+      </div>
+    )}
+  </div>
+</section>
+
+<style>
+  /* ---------- com avaliações ---------- */
+  /* Flex centralizado: com 1 ou 2 avaliações os cards ficam no meio, sem coluna vazia. */
+  .reviews {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 24px;
+    margin-top: 48px;
+  }
+  .review {
+    display: flex;
+    flex: 1 1 300px;
+    max-width: calc((100% - 48px) / 3);
+  }
+  .review__figure {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    padding: 28px 26px 24px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--card);
+  }
+  .review__stars {
+    display: inline-flex;
+    gap: 2px;
+    color: var(--line);
+  }
+  .review__star.is-on {
+    color: var(--gold);
+  }
+  .review__star.is-on :global(svg) {
+    fill: currentColor;
+  }
+  .review__text {
+    flex: 1;
+    margin: 12px 0 0;
+    font-size: 15.5px;
+    line-height: 1.7;
+    color: var(--ink);
+  }
+  .review__author {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 20px;
+    font-size: 13.5px;
+    line-height: 1.4;
+    color: var(--ink-3);
+  }
+  .review__author strong {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .review__avatar {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--brand-50);
+    color: var(--brand);
+    font-weight: 600;
+    font-size: 14px;
+  }
+  .reviews__more {
+    display: flex;
+    justify-content: center;
+    margin-top: 40px;
+  }
+
+  /* ---------- convite (sem avaliações cadastradas) ---------- */
+  .invite {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 720px;
+    margin: 44px auto 0;
+    padding: 56px 32px 48px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--card);
+    text-align: center;
+  }
+  .invite__icon {
+    width: 56px;
+    height: 56px;
+  }
+  .invite__icon :global(svg) {
+    width: 24px;
+    height: 24px;
+  }
+  .invite__text {
+    max-width: 30ch;
+    margin-top: 20px;
+    font: italic 500 clamp(22px, 2.4vw, 26px) / 1.35 var(--serif);
+    color: var(--ink);
+    text-wrap: balance;
+  }
+  .invite .btn {
+    margin-top: 28px;
+  }
+
+  @media (max-width: 900px) {
+    .review {
+      flex-basis: 100%;
+      max-width: 560px;
+    }
+  }
+  @media (max-width: 560px) {
+    .invite {
+      padding: 44px 20px 36px;
+    }
+    .invite .btn,
+    .reviews__more .btn {
+      width: 100%;
+    }
+  }
+</style>

@@ -1,0 +1,169 @@
+---
+/**
+ * Seção "Como é a nossa torta" da página do sabor. Só fatos da casa, derivados de src/data:
+ * massa fininha, duas camadas de recheio nas salgadas, creme de queijo da casa (citando os sabores
+ * que de fato levam) e venda na fatia ou inteira.
+ */
+import { Picture } from 'astro:assets';
+import Icon from '../ui/Icon.astro';
+import type { IconName } from '../ui/Icon.astro';
+import corte from '../../assets/fotos/torta-frango-corte.jpg';
+import inteira from '../../assets/fotos/torta-inteira-gratinada.jpg';
+import { business } from '../../data/business';
+import type { Torta } from '../../data/menu';
+import { tortas } from '../../data/menu';
+import { href } from '../../lib/links';
+import { joinList, shortName } from './meta';
+
+interface Props {
+  torta: Torta;
+}
+
+interface Fact {
+  icon: IconName;
+  title: string;
+  text: string;
+}
+
+const { torta } = Astro.props;
+
+// A foto em corte mostra a massa fina e as camadas; se ela já está no topo desta página, usa a inteira.
+const shownOnPage = new Set([torta.photo, ...torta.gallery].map((p) => p.src.src));
+const photo = shownOnPage.has(corte.src)
+  ? { src: inteira, alt: 'Torta inteira gratinada vista de cima, com a borda de massa fina' }
+  : {
+      src: corte,
+      alt: 'Fatia de torta de frango vista de lado, mostrando a massa fina na base, o recheio e a camada de creme de queijo',
+    };
+
+const withHouseCream = tortas.filter((t) =>
+  t.ingredients.some((i) => /^creme de queijos? da casa$/i.test(i)),
+);
+
+const facts: Fact[] = [
+  {
+    icon: 'slice',
+    title: 'Massa fininha',
+    text:
+      torta.category === 'salgada'
+        ? 'A massa é bem fininha e fica só na base e nas bordas.'
+        : 'A massa é bem fininha, para o recheio ser o protagonista.',
+  },
+  {
+    icon: 'layers',
+    title: 'Duas camadas de recheio',
+    text: 'Nas tortas salgadas, o recheio vem em duas camadas generosas.',
+  },
+  ...(withHouseCream.length > 0
+    ? [
+        {
+          icon: 'cheese',
+          title: 'Creme de queijo da casa',
+          text: `Receita própria, gratinada no forno, nas tortas de ${joinList(withHouseCream.map(shortName))}.`,
+        } satisfies Fact,
+      ]
+    : []),
+  {
+    icon: 'bag',
+    title: 'Na fatia ou inteira',
+    text: 'Todos os sabores saem na fatia e também inteiros, por encomenda.',
+  },
+];
+---
+
+<section class="section section--alt" aria-labelledby="como-e-title">
+  <div class="container facts">
+    <figure class="photo facts__photo" data-reveal>
+      <Picture
+        src={photo.src}
+        alt={photo.alt}
+        formats={['avif', 'webp']}
+        widths={[480, 720, 960, 1160]}
+        width={1160}
+        sizes="(max-width: 900px) calc(100vw - 40px), 564px"
+        loading="lazy"
+        decoding="async"
+      />
+    </figure>
+    <div class="facts__body" data-reveal>
+      <span class="label">Massa fininha, recheio em dobro</span>
+      <h2 class="h2 facts__title" id="como-e-title">
+        Como é a nossa torta
+      </h2>
+      <p class="facts__lead">
+        Na {business.name}, a massa é só o apoio: a fatia tem muito mais recheio do que massa.
+      </p>
+      <ul class="facts__list">
+        {facts.map((fact) => (
+          <li class="fact">
+            <span class="icon-dot">
+              <Icon name={fact.icon} />
+            </span>
+            <div>
+              <h3 class="fact__title">{fact.title}</h3>
+              <p class="fact__text">{fact.text}</p>
+            </div>
+          </li>
+        ))}
+      </ul>
+      <a class="btn btn--outline" href={href('/sobre/')}>
+        Conheça a {business.name}
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .facts {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 72px;
+    align-items: center;
+  }
+  .facts__photo {
+    aspect-ratio: 5 / 4;
+  }
+  .facts__photo :global(picture) {
+    height: 100%;
+  }
+  .facts__title {
+    margin-top: 12px;
+  }
+  .facts__lead {
+    margin-top: 16px;
+    color: var(--ink-2);
+    max-width: 52ch;
+  }
+  .facts__list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px 28px;
+    margin: 30px 0 34px;
+  }
+  .fact {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+  .fact__title {
+    font: 600 15px/1.35 var(--sans);
+    padding-top: 2px;
+  }
+  .fact__text {
+    margin-top: 4px;
+    font-size: 14.5px;
+    line-height: 1.6;
+    color: var(--ink-2);
+  }
+  @media (max-width: 900px) {
+    .facts {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 40px;
+    }
+  }
+  @media (max-width: 560px) {
+    .facts__list {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

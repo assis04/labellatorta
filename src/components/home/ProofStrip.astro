@@ -1,0 +1,131 @@
+---
+/**
+ * Faixa de provas logo abaixo do hero. Só fatos verificáveis, todos derivados dos dados:
+ * selo do Restaurant Guru, seguidores no Instagram, número de sabores e horário.
+ * Sem nota do Google (a casa ainda não forneceu) — nunca inventar.
+ */
+import { Picture } from 'astro:assets';
+import Icon from '../ui/Icon.astro';
+import seal from '../../assets/fotos/selo-restaurant-guru-2026.png';
+import { business } from '../../data/business';
+import { doces, salgadas, tortas } from '../../data/menu';
+import { capitalize, summarizeWeek } from './week';
+
+const { award, social } = business;
+const week = summarizeWeek();
+/** "Recomendado pelo Restaurant Guru" → "Restaurant Guru" (com fallback para o nome completo). */
+const awardBy = /\bpel[oa]\s+(.+)$/i.exec(award.name)?.[1] ?? award.name;
+
+const items = [
+  { icon: 'instagram', title: `+${social.instagramFollowers} seguidores`, text: 'no Instagram' },
+  {
+    icon: 'list',
+    title: `${tortas.length} sabores`,
+    text: `${salgadas.length} salgados e ${doces.length} doces`,
+  },
+  {
+    icon: 'clock',
+    title: `${capitalize(week.daysShort)}, desde as ${week.opensAt}`,
+    text: week.closedNote,
+  },
+] as const;
+---
+
+<section class="proof" aria-label={`${business.name} em resumo`}>
+  <ul class="container proof__list">
+    <li class="proof__item">
+      <span class="proof__icon proof__icon--seal">
+        <Picture
+          src={seal}
+          alt=""
+          formats={['avif', 'webp']}
+          widths={[42, 84, 126]}
+          width={126}
+          sizes="42px"
+        />
+      </span>
+      <span class="proof__text">
+        <strong>{awardBy}</strong> {`Recomendado em ${award.year}`}
+      </span>
+    </li>
+    {items.map((item) => (
+      <li class="proof__item">
+        <span class="proof__icon">
+          <Icon name={item.icon} />
+        </span>
+        <span class="proof__text">
+          <strong>{item.title}</strong> {item.text}
+        </span>
+      </li>
+    ))}
+  </ul>
+</section>
+
+<style>
+  .proof {
+    background: var(--bg-alt);
+    border-bottom: 1px solid var(--line);
+  }
+  .proof__list {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 20px;
+    padding-block: 22px;
+  }
+  .proof__item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    min-width: 0;
+  }
+  .proof__icon {
+    width: 42px;
+    height: 42px;
+    flex: none;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    border-radius: 50%;
+    border: 1px solid var(--line);
+    background: #fff;
+    color: var(--brand);
+  }
+  .proof__icon--seal :global(picture),
+  .proof__icon--seal :global(img) {
+    width: 100%;
+    height: 100%;
+  }
+  .proof__icon--seal :global(img) {
+    object-fit: cover;
+    object-position: 50% 28%;
+  }
+  .proof__text {
+    font-size: 13px;
+    line-height: 1.35;
+    color: var(--ink-2);
+  }
+  .proof__text strong {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  @media (max-width: 900px) {
+    .proof__list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px 16px;
+    }
+    .proof__item {
+      justify-content: flex-start;
+    }
+  }
+  @media (max-width: 520px) {
+    .proof__list {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 14px;
+      padding-block: 24px;
+    }
+  }
+</style>

@@ -1,0 +1,74 @@
+---
+/** Atalhos do cardápio (âncoras para as seções), em pílulas com a contagem de sabores. */
+interface Item {
+  /** id da seção de destino, sem "#". */
+  id: string;
+  label: string;
+  count: number;
+}
+
+interface Props {
+  items: readonly Item[];
+}
+
+const { items } = Astro.props;
+---
+
+<nav class="jump" aria-label="Atalhos do cardápio">
+  <ul class="jump__list">
+    {items.map((item) => (
+      <li>
+        <a class="jump__link" href={`#${item.id}`}>
+          {item.label}
+          <span class="jump__count">
+            <span class="sr-only">, </span>
+            {item.count}
+            <span class="sr-only"> {item.count === 1 ? 'sabor' : 'sabores'}</span>
+          </span>
+        </a>
+      </li>
+    ))}
+  </ul>
+</nav>
+
+<style>
+  .jump {
+    margin-top: 28px;
+  }
+  .jump__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .jump__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 44px;
+    padding: 0 8px 0 20px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--card);
+    font: 500 14px/1.2 var(--sans);
+    transition:
+      border-color 0.25s var(--ease),
+      color 0.25s var(--ease);
+  }
+  .jump__link:hover {
+    border-color: var(--brand);
+    color: var(--brand);
+  }
+  .jump__count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    height: 28px;
+    padding: 0 6px;
+    border-radius: 999px;
+    background: var(--brand-50);
+    color: var(--brand);
+    font-size: 12.5px;
+    font-weight: 600;
+  }
+</style>

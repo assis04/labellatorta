@@ -1,0 +1,38 @@
+---
+/**
+ * Página inicial. Cada seção é um componente em src/components/home/ e todo fato vem de src/data/.
+ * Ordem e fundos seguem o esboço aprovado (v2): hero com foto → faixa bege → creme/bege alternados.
+ * Restaurant e WebSite (JSON-LD) já entram pelo layout; a home não precisa de schema extra.
+ */
+import Base from '../layouts/Base.astro';
+import HomeHero from '../components/home/HomeHero.astro';
+import ProofStrip from '../components/home/ProofStrip.astro';
+import AboutTorta from '../components/home/AboutTorta.astro';
+import LunchBanner from '../components/home/LunchBanner.astro';
+import MenuHighlights from '../components/home/MenuHighlights.astro';
+import OrdersSection from '../components/home/OrdersSection.astro';
+import VisitSection from '../components/home/VisitSection.astro';
+import PickupSection from '../components/home/PickupSection.astro';
+import ReviewsSection from '../components/home/ReviewsSection.astro';
+import FaqPreview from '../components/home/FaqPreview.astro';
+import InstagramSection from '../components/home/InstagramSection.astro';
+import { business } from '../data/business';
+
+const { name, address } = business;
+const title = `${name} · Tortas artesanais no ${address.neighborhood} (${address.state})`;
+const description = `Tortas artesanais de massa fininha e recheio em dobro no ${address.neighborhood}, Zona Leste de SP. Almoço com salada e encomenda de tortas inteiras.`;
+---
+
+<Base title={title} fullTitle description={description} path="/" headerOverlay>
+  <HomeHero />
+  <ProofStrip />
+  <AboutTorta />
+  <LunchBanner />
+  <MenuHighlights />
+  <OrdersSection />
+  <VisitSection />
+  <PickupSection />
+  <ReviewsSection />
+  <FaqPreview />
+  <InstagramSection />
+</Base>

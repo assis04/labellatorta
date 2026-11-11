@@ -1,0 +1,37 @@
+---
+/** Botões "como chegar": Google Maps e Waze, sempre a partir de `links` (src/data/business.ts). */
+import Icon from '../ui/Icon.astro';
+import { links } from '../../data/business';
+
+interface Props {
+  /** Onde os botões estão, para o evento de analytics (ex.: "contato", "almoco"). */
+  where: string;
+  class?: string;
+}
+const { where, class: className } = Astro.props;
+---
+
+<div class:list={['btn-row', 'btn-row--stack-mobile', className]}>
+  <a
+    class="btn btn--primary"
+    href={links.googleMaps}
+    target="_blank"
+    rel="noopener"
+    data-track="mapa"
+    data-track-intent={`google-maps-${where}`}
+  >
+    <Icon name="pin" />
+    Abrir no Google Maps<span class="sr-only"> (abre em nova aba)</span>
+  </a>
+  <a
+    class="btn btn--outline"
+    href={links.waze}
+    target="_blank"
+    rel="noopener"
+    data-track="mapa"
+    data-track-intent={`waze-${where}`}
+  >
+    <Icon name="navigation" />
+    Ir com o Waze<span class="sr-only"> (abre em nova aba)</span>
+  </a>
+</div>

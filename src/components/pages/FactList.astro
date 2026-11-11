@@ -1,0 +1,37 @@
+---
+/** Linha de fatos curtos com ícone (ex.: dias e horário, endereço), usada no topo das páginas internas. */
+import Icon, { type IconName } from '../ui/Icon.astro';
+
+interface Props {
+  items: readonly { icon: IconName; text: string }[];
+  class?: string;
+}
+const { items, class: className } = Astro.props;
+---
+
+<ul class:list={['facts', className]}>
+  {items.map((item) => (
+    <li>
+      <Icon name={item.icon} size={16} />
+      <span>{item.text}</span>
+    </li>
+  ))}
+</ul>
+
+<style>
+  .facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 26px;
+    font-size: 14px;
+    color: var(--ink-2);
+  }
+  .facts li {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .facts :global(svg) {
+    color: var(--brand);
+  }
+</style>

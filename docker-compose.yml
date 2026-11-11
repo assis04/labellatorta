@@ -1,0 +1,34 @@
+# Prévia de produção local (ou auto-hospedagem) com os headers de segurança do nginx.conf.
+#
+#   docker compose up --build -d     ->  http://localhost:8080
+#   docker compose down
+#
+# Porta 8080: o nginx roda sem root e não abre portas < 1024. Ela é publicada só em 127.0.0.1;
+# para expor na rede, ponha um proxy com TLS na frente (e ligue o HSTS no nginx.conf).
+# Variáveis de build vêm do ambiente ou do .env (ver .env.example); padrão = prévia sem indexação.
+name: labellatorta
+
+services:
+  site:
+    build:
+      context: .
+      args:
+        SITE_URL: ${SITE_URL:-https://www.labellatorta.com.br}
+        BASE_PATH: ${BASE_PATH:-/}
+        SITE_INDEXABLE: ${SITE_INDEXABLE:-false}
+        PLAUSIBLE_DOMAIN: ${PLAUSIBLE_DOMAIN:-}
+    image: labellatorta-site:local
+    ports:
+      - '127.0.0.1:8080:8080'
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=16m
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    healthcheck:
+      test: ['CMD', 'wget', '-q', '-O', '/dev/null', 'http://127.0.0.1:8080/healthz']
+      interval: 30s
+      timeout: 3s
+      start_period: 5s
+      retries: 3
+    restart: unless-stopped

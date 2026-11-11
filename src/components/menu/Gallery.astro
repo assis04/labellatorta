@@ -1,0 +1,169 @@
+---
+/**
+ * Fotos do topo da página do sabor: a principal grande (é o LCP: eager + fetchpriority high) e,
+ * quando o sabor tem mais fotos, miniaturas que trocam a principal.
+ * Funciona sem JS: cada miniatura é uma âncora para a foto e o CSS mostra a foto alvo (:target).
+ * Com JS (gallery.ts) a troca é feita no lugar, sem rolar a página.
+ */
+import { Picture } from 'astro:assets';
+import type { Photo } from '../../data/menu';
+
+interface Props {
+  photos: readonly Photo[];
+  /** Prefixo único dos ids das fotos (o slug do sabor). */
+  idPrefix: string;
+}
+
+const { photos, idPrefix } = Astro.props;
+const multiple = photos.length > 1;
+const slideId = (index: number) => `${idPrefix}-foto-${index + 1}`;
+const sizes = '(max-width: 959px) calc(100vw - 40px), (max-width: 1247px) 54vw, 620px';
+---
+
+<div class="gallery" data-gallery={multiple ? '' : undefined}>
+  <div class="gallery__stage photo">
+    {photos.map((photo, i) => (
+      <figure
+        class="gallery__slide"
+        id={multiple ? slideId(i) : undefined}
+        data-gallery-slide
+        data-active={i === 0 ? '' : undefined}
+      >
+        <Picture
+          src={photo.src}
+          alt={photo.alt}
+          formats={['avif', 'webp']}
+          widths={[480, 720, 960, 1240]}
+          width={1240}
+          sizes={sizes}
+          loading={i === 0 ? 'eager' : 'lazy'}
+          fetchpriority={i === 0 ? 'high' : 'auto'}
+          decoding="async"
+        />
+      </figure>
+    ))}
+  </div>
+
+  {multiple && (
+    <>
+      <ul class="gallery__thumbs">
+        {photos.map((photo, i) => (
+          <li>
+            <a
+              class="gallery__thumb"
+              href={`#${slideId(i)}`}
+              aria-current={i === 0 ? 'true' : undefined}
+              data-gallery-thumb
+            >
+              <Picture
+                src={photo.src}
+                alt=""
+                formats={['avif', 'webp']}
+                widths={[88, 176]}
+                width={176}
+                height={176}
+                fit="cover"
+                sizes="88px"
+                loading="lazy"
+                decoding="async"
+              />
+              <span class="sr-only">
+                Ver foto {i + 1} de {photos.length}: {photo.alt}
+              </span>
+            </a>
+          </li>
+        ))}
+      </ul>
+      <p class="sr-only" aria-live="polite" data-gallery-status />
+    </>
+  )}
+</div>
+
+<script>
+  import './gallery';
+</script>
+
+<style>
+  .gallery__stage {
+    position: relative;
+    aspect-ratio: 4 / 3;
+  }
+  .gallery__slide {
+    position: absolute;
+    inset: 0;
+  }
+  .gallery__slide :global(picture) {
+    height: 100%;
+  }
+
+  /* Estado inicial (igual com e sem JS): só a foto marcada como ativa aparece. */
+  .gallery__slide:not([data-active]) {
+    display: none;
+  }
+
+  /* Sem JS: a miniatura é uma âncora e a foto alvo (:target) passa a ser a visível. */
+  .gallery:not([data-gallery-ready]) .gallery__stage:has(> :target) > .gallery__slide {
+    display: none;
+  }
+  .gallery:not([data-gallery-ready]) .gallery__stage > .gallery__slide:target {
+    display: block;
+  }
+
+  /* Com JS: entrada suave só depois que a pessoa troca de foto (nunca no carregamento). */
+  .gallery[data-gallery-interacted] .gallery__slide[data-active] {
+    animation: gallery-in 0.35s var(--ease);
+  }
+  @keyframes gallery-in {
+    from {
+      opacity: 0;
+    }
+  }
+
+  .gallery__thumbs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 14px;
+  }
+  .gallery__thumb {
+    position: relative;
+    display: block;
+    width: 88px;
+    height: 88px;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    background: var(--bg-alt);
+    opacity: 0.72;
+    transition: opacity 0.25s var(--ease);
+  }
+  .gallery__thumb::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    box-shadow: inset 0 0 0 1px rgba(43, 37, 34, 0.08);
+    transition: box-shadow 0.25s var(--ease);
+  }
+  .gallery__thumb:hover,
+  .gallery__thumb[aria-current='true'] {
+    opacity: 1;
+  }
+  .gallery__thumb[aria-current='true']::after {
+    box-shadow: inset 0 0 0 2px var(--brand);
+  }
+  .gallery__thumb :global(picture),
+  .gallery__thumb :global(img) {
+    width: 100%;
+    height: 100%;
+  }
+  .gallery__thumb :global(img) {
+    object-fit: cover;
+  }
+
+  @media (max-width: 560px) {
+    .gallery__thumb {
+      width: 72px;
+      height: 72px;
+    }
+  }
+</style>

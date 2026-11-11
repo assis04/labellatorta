@@ -1,0 +1,162 @@
+---
+/**
+ * "Como pedir" do cardápio: na fatia ou inteira (encomenda pelo WhatsApp) e o almoço com fatia +
+ * salada. Só fatos confirmados; o que não está nos dados (prazo, tamanho, preço) não aparece.
+ */
+import { Picture } from 'astro:assets';
+import SectionHead from '../ui/SectionHead.astro';
+import WhatsAppIcon from '../ui/WhatsAppIcon.astro';
+import caixa from '../../assets/fotos/encomenda-caixa.jpg';
+import almoco from '../../assets/fotos/almoco-torta-salada-planta.jpg';
+import { business } from '../../data/business';
+import { href, whatsappUrl } from '../../lib/links';
+
+const sizes = '(max-width: 900px) calc(100vw - 40px), 586px';
+---
+
+<section class="section section--alt" aria-labelledby="como-pedir-title">
+  <div class="container">
+    <SectionHead label="Como pedir" title="Na fatia, inteira ou no almoço" id="como-pedir-title" />
+    <div class="ways">
+      <article class="way" data-reveal>
+        <div class="way__img photo">
+          <Picture
+            src={caixa}
+            alt="Torta inteira sendo colocada na caixa de papel kraft da La Bella Torta"
+            formats={['avif', 'webp']}
+            widths={[480, 720, 960, 1172]}
+            width={1172}
+            sizes={sizes}
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+        <div class="way__body">
+          <h3 class="way__title">Na fatia ou inteira</h3>
+          <p class="way__text">
+            Todos os sabores saem na fatia e também inteiros. Para a torta inteira, mande o sabor e o dia pelo
+            WhatsApp {business.phone.display} e a gente combina a retirada ou a entrega.
+          </p>
+          <div class="way__actions">
+            <a
+              class="btn btn--primary"
+              href={whatsappUrl('encomenda')}
+              target="_blank"
+              rel="noopener"
+              data-track="whatsapp"
+              data-track-intent="cardapio-encomenda"
+            >
+              <WhatsAppIcon size={18} />
+              Encomendar pelo WhatsApp
+            </a>
+            <a class="way__link" href={href('/encomendas/')}>
+              Como funciona a encomenda
+            </a>
+          </div>
+        </div>
+      </article>
+
+      <article class="way" data-reveal>
+        <div class="way__img way__img--almoco photo">
+          <Picture
+            src={almoco}
+            alt="Prato de almoço com uma fatia de torta e a salada da casa, numa mesa do salão da La Bella Torta"
+            formats={['avif', 'webp']}
+            widths={[480, 720, 960, 1172]}
+            width={1172}
+            sizes={sizes}
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+        <div class="way__body">
+          <h3 class="way__title">Almoço com fatia e salada</h3>
+          <p class="way__text">
+            No almoço, você escolhe uma fatia de torta salgada e acompanha com a salada da casa.
+          </p>
+          <div class="way__actions">
+            <a class="btn btn--outline" href={href('/almoco/')}>
+              Ver o almoço
+            </a>
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<style>
+  .ways {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 28px;
+    margin-top: 48px;
+  }
+  .way {
+    display: flex;
+    flex-direction: column;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .way__img {
+    aspect-ratio: 16 / 10;
+    border-radius: 0;
+  }
+  .way__img :global(picture) {
+    height: 100%;
+  }
+  .way__img--almoco :global(img) {
+    object-position: 50% 68%;
+  }
+  .way__body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: 28px 28px 30px;
+  }
+  .way__title {
+    font: 600 19px/1.3 var(--sans);
+  }
+  .way__text {
+    margin-top: 10px;
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--ink-2);
+  }
+  .way__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 24px;
+    margin-top: auto;
+    padding-top: 24px;
+  }
+  .way__link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--brand);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+  .way__link:hover {
+    color: var(--brand-700);
+  }
+  @media (max-width: 900px) {
+    .ways {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  @media (max-width: 560px) {
+    .way__body {
+      padding: 24px 20px 26px;
+    }
+    .way__actions > .btn {
+      width: 100%;
+    }
+  }
+</style>

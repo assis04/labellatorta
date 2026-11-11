@@ -1,0 +1,49 @@
+---
+/**
+ * Topo das páginas internas: faixa bege com trilha, rótulo, H1 e texto de apoio.
+ * O header fica sólido nessas páginas (só a home tem header transparente sobre foto).
+ */
+import Breadcrumbs from './Breadcrumbs.astro';
+import type { Crumb } from '../../lib/schema';
+
+interface Props {
+  label: string;
+  title: string;
+  lead?: string;
+  crumbs: readonly Crumb[];
+}
+const { label, title, lead, crumbs } = Astro.props;
+---
+
+<section class="page-hero">
+  <div class="container">
+    <Breadcrumbs crumbs={crumbs} />
+    <span class="label page-hero__label">{label}</span>
+    <h1 class="h1 page-hero__title">{title}</h1>
+    {lead && <p class="lead page-hero__lead">{lead}</p>}
+    <slot />
+  </div>
+</section>
+
+<style>
+  .page-hero {
+    background: var(--bg-alt);
+    border-bottom: 1px solid var(--line);
+    padding: calc(var(--header-h) + 40px) 0 56px;
+  }
+  .page-hero__label {
+    margin-top: 28px;
+  }
+  .page-hero__title {
+    margin-top: 12px;
+    max-width: 22ch;
+  }
+  .page-hero__lead {
+    margin-top: 16px;
+  }
+  @media (max-width: 768px) {
+    .page-hero {
+      padding: calc(var(--header-h) + 24px) 0 44px;
+    }
+  }
+</style>

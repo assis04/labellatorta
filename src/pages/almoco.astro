@@ -1,0 +1,522 @@
+---
+import { Picture } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/ui/PageHero.astro';
+import CtaBand from '../components/ui/CtaBand.astro';
+import Icon from '../components/ui/Icon.astro';
+import OpenStatus from '../components/ui/OpenStatus.astro';
+import WhatsAppIcon from '../components/ui/WhatsAppIcon.astro';
+import FactList from '../components/pages/FactList.astro';
+import HoursTable from '../components/pages/HoursTable.astro';
+import MapButtons from '../components/pages/MapButtons.astro';
+import Steps from '../components/pages/Steps.astro';
+import { daysLabel, earliestOpening, joinPt, openDays } from '../components/pages/hours-text';
+import { business, fullAddress, openingHours } from '../data/business';
+import { doces, salgadas, tagLabels } from '../data/menu';
+import { href, whatsappUrl } from '../lib/links';
+import fotoPlanta from '../assets/fotos/almoco-torta-salada-planta.jpg';
+import fotoMesa from '../assets/fotos/almoco-torta-salada-mesa.jpg';
+import fotoSalao from '../assets/fotos/almoco-salao.jpg';
+import fotoBurrata from '../assets/fotos/salada-burrata.jpg';
+import fotoVerde from '../assets/fotos/salada-verde.jpg';
+
+/* Almoço = horário da casa: dias em que abre e o horário de abertura (src/data/business.ts). */
+const lunchDays = daysLabel(openDays(openingHours));
+const lunchFrom = earliestOpening(openingHours);
+const lunchWhen = `De ${lunchDays}, a partir das ${lunchFrom}`;
+const vegCount = salgadas.filter((t) => t.tags.includes('vegetariana')).length;
+const sweetNames = joinPt(doces.map((t) => t.name.toLowerCase()));
+
+const title = 'Almoço no Parque São Jorge: torta e salada';
+const description = `Almoço de ${lunchDays}, a partir das ${lunchFrom}: fatia de torta salgada à escolha e salada da casa montada na hora. No Parque São Jorge, Zona Leste de SP.`;
+const crumbs = [
+  { name: 'Início', path: '/' },
+  { name: 'Almoço', path: '/almoco/' },
+];
+
+const steps = [
+  {
+    title: 'Escolha a fatia',
+    text: `São ${salgadas.length} tortas salgadas, ${vegCount} delas vegetarianas, todas com massa fininha e duas camadas de recheio.`,
+  },
+  {
+    title: 'A salada vem montada na hora',
+    text: 'A salada da casa é montada quando você pede, para acompanhar a fatia.',
+  },
+  {
+    title: 'No salão ou para levar',
+    text: 'Almoce com a gente no salão ou peça pelo WhatsApp para levar.',
+  },
+];
+---
+
+<Base
+  title={title}
+  description={description}
+  path="/almoco/"
+  crumbs={crumbs}
+  shareImage={fotoSalao}
+  shareImageAlt="Prato com fatia de torta e salada no salão da La Bella Torta"
+>
+  <PageHero
+    label="Almoço"
+    title="Almoço com fatia de torta e salada da casa"
+    lead={`${lunchWhen}, você escolhe uma fatia de torta salgada e a gente monta a salada da casa na hora. Dá para almoçar no salão ou pedir para levar.`}
+    crumbs={crumbs}
+  >
+    <div class="hero-extra">
+      <FactList
+        items={[
+          { icon: 'clock', text: lunchWhen },
+          { icon: 'pin', text: `${business.address.street} · ${business.address.neighborhood}` },
+        ]}
+      />
+      <div class="btn-row btn-row--stack-mobile">
+        <a
+          class="btn btn--primary"
+          href={whatsappUrl('almoco')}
+          target="_blank"
+          rel="noopener"
+          data-track="whatsapp"
+          data-track-intent="almoco-topo"
+        >
+          <WhatsAppIcon size={18} />
+          Pedir para levar<span class="sr-only"> (abre o WhatsApp em nova aba)</span>
+        </a>
+        <a class="btn btn--outline" href="#como-chegar">
+          Como chegar
+        </a>
+      </div>
+    </div>
+  </PageHero>
+
+  <section class="section" aria-labelledby="como-funciona">
+    <div class="container split">
+      <figure class="photo split__photo split__photo--portrait">
+        <Picture
+          src={fotoPlanta}
+          alt="Fatia de torta salgada e salada de folhas com muçarela, tomate seco e azeitonas, servidas no mesmo prato sobre a mesa do salão"
+          formats={['avif', 'webp']}
+          widths={[420, 720, 1128]}
+          width={1128}
+          sizes="(max-width: 900px) calc(100vw - 40px), 564px"
+          loading="eager"
+          fetchpriority="high"
+          decoding="async"
+        />
+      </figure>
+      <div>
+        <span class="label">Como funciona</span>
+        <h2 class="h2 split__title" id="como-funciona">
+          Fatia à escolha, salada montada na hora
+        </h2>
+        <div class="split__steps">
+          <Steps steps={steps} />
+        </div>
+        <a class="btn btn--outline" href="#sabores">
+          Ver os sabores do almoço
+          <Icon name="arrow" />
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--alt" id="sabores" aria-labelledby="sabores-titulo">
+    <div class="container">
+      <header class="flavors-head" data-reveal>
+        <span class="label">Tortas salgadas</span>
+        <h2 class="h2" id="sabores-titulo">
+          Escolha o sabor da sua fatia
+        </h2>
+        <p class="flavors-head__sub">
+          {vegCount} das {salgadas.length} tortas salgadas são vegetarianas. Toque no sabor para ver o
+          recheio.
+        </p>
+      </header>
+
+      <ul class="flavor-list">
+        {salgadas.map((torta) => {
+          const tag = torta.tags[0];
+          return (
+            <li>
+              <a class="flavor-row" href={href(`/tortas/${torta.slug}/`)}>
+                <div class="flavor-row__img photo">
+                  <Picture
+                    src={torta.photo.src}
+                    alt=""
+                    formats={['avif', 'webp']}
+                    widths={[160, 320]}
+                    width={320}
+                    sizes="(max-width: 560px) 128px, 160px"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </div>
+                <div class="flavor-row__text">
+                  <div class="flavor-row__top">
+                    <h3 class="flavor-row__name">{torta.name}</h3>
+                    {tag && (
+                      <span class:list={['badge', tag === 'vegetariana' ? 'badge--veg' : 'badge--hot']}>
+                        {tagLabels[tag]}
+                      </span>
+                    )}
+                  </div>
+                  <span class="flavor-row__summary">{torta.summary}</span>
+                </div>
+                <Icon name="arrow" class="flavor-row__arrow" />
+              </a>
+            </li>
+          );
+        })}
+      </ul>
+
+      <div class="flavors-foot">
+        <p>Para fechar, as tortas doces também saem na fatia: {sweetNames}.</p>
+        <a class="btn btn--outline" href={href('/cardapio/')}>
+          Ver o cardápio completo
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="salada-titulo">
+    <div class="container salad">
+      <div class="salad__text" data-reveal>
+        <span class="label">A salada da casa</span>
+        <h2 class="h2 salad__title" id="salada-titulo">
+          Montada na hora, para acompanhar a torta
+        </h2>
+        <p class="salad__body">
+          A salada da casa é montada quando você pede o almoço e chega à mesa junto com a fatia de torta
+          salgada.
+        </p>
+        <p class="salad__body">Quer saber o que tem no almoço de hoje? É só perguntar pelo WhatsApp.</p>
+        <a
+          class="btn btn--primary salad__cta"
+          href={whatsappUrl('almoco')}
+          target="_blank"
+          rel="noopener"
+          data-track="whatsapp"
+          data-track-intent="almoco-salada"
+        >
+          <WhatsAppIcon size={18} />
+          Perguntar o almoço de hoje<span class="sr-only"> (abre o WhatsApp em nova aba)</span>
+        </a>
+      </div>
+
+      <div class="mosaic">
+        <figure class="photo mosaic__tall">
+          <Picture
+            src={fotoMesa}
+            alt="Fatia de torta salgada ao lado de salada de folhas com queijo e grãos crocantes por cima, em prato cinza sobre jogo americano escuro"
+            formats={['avif', 'webp']}
+            widths={[320, 480, 680]}
+            width={680}
+            sizes="(max-width: 560px) calc(100vw - 40px), (max-width: 900px) calc(50vw - 28px), 330px"
+            loading="lazy"
+            decoding="async"
+          />
+        </figure>
+        <figure class="photo">
+          <Picture
+            src={fotoBurrata}
+            alt="Salada vista de cima com folhas verdes, bolinhas de muçarela, tomate seco e azeitonas pretas, com molho verde à parte"
+            formats={['avif', 'webp']}
+            widths={[320, 480, 660]}
+            width={660}
+            sizes="(max-width: 900px) calc(50vw - 28px), 330px"
+            loading="lazy"
+            decoding="async"
+          />
+        </figure>
+        <figure class="photo">
+          <Picture
+            src={fotoVerde}
+            alt="Salada verde vista de cima com folhas, tomate-cereja e cebola em rodelas, com azeite à parte"
+            formats={['avif', 'webp']}
+            widths={[320, 480, 660]}
+            width={660}
+            sizes="(max-width: 900px) calc(50vw - 28px), 330px"
+            loading="lazy"
+            decoding="async"
+          />
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--alt" id="como-chegar" aria-labelledby="chegar-titulo">
+    <div class="container visit">
+      <div class="photo visit__photo">
+        <Picture
+          src={fotoSalao}
+          alt="Prato com fatia de torta e salada numa mesa do salão da La Bella Torta, com o balcão e o letreiro em neon ao fundo"
+          formats={['avif', 'webp']}
+          widths={[420, 720, 950]}
+          width={950}
+          sizes="(max-width: 900px) calc(100vw - 40px), 475px"
+          loading="lazy"
+          decoding="async"
+        />
+        <div class="visit__status">
+          <OpenStatus />
+        </div>
+      </div>
+      <div class="visit__body" data-reveal>
+        <span class="label">Como chegar</span>
+        <h2 class="h2 visit__title" id="chegar-titulo">
+          Estamos na {business.address.street}
+        </h2>
+        <p class="visit__addr">
+          <Icon name="pin" />
+          <span>
+            {fullAddress}. Fica na região do {business.address.district}, na Zona Leste.
+          </span>
+        </p>
+        <div class="visit__hours">
+          <HoursTable caption="Horário de funcionamento e do almoço" />
+        </div>
+        <MapButtons where="almoco" />
+        <p class="visit__more">
+          Telefone, e-mail e mapa na página de <a href={href('/contato/')}>contato</a>.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <CtaBand
+    title="Vai levar o almoço?"
+    text={`Chame no WhatsApp ${business.phone.display}, pergunte o que tem hoje e peça para levar.`}
+    intent="almoco"
+    buttonLabel="Pedir para levar"
+  />
+</Base>
+
+<style>
+  .hero-extra {
+    display: grid;
+    gap: 28px;
+    margin-top: 26px;
+  }
+
+  /* ---------- como funciona ---------- */
+  .split {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 72px;
+    align-items: center;
+  }
+  .split__photo--portrait {
+    aspect-ratio: 4 / 5;
+  }
+  .split__title {
+    margin-top: 12px;
+  }
+  .split__steps {
+    margin: 32px 0 36px;
+  }
+
+  /* ---------- sabores ---------- */
+  .flavors-head .h2 {
+    margin-top: 12px;
+  }
+  .flavors-head__sub {
+    margin-top: 12px;
+    color: var(--ink-2);
+  }
+  .flavor-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 48px;
+    margin-top: 40px;
+    border-top: 1px solid var(--line);
+  }
+  .flavor-list li {
+    border-bottom: 1px solid var(--line);
+  }
+  .flavor-row {
+    display: grid;
+    grid-template-columns: 88px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 20px;
+    padding: 18px 0;
+  }
+  .flavor-row__img {
+    width: 88px;
+    height: 88px;
+    border-radius: 12px;
+  }
+  .flavor-row__img :global(img) {
+    transition: transform 0.6s var(--ease);
+  }
+  .flavor-row:hover .flavor-row__img :global(img) {
+    transform: scale(1.06);
+  }
+  .flavor-row__top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 12px;
+  }
+  .flavor-row__name {
+    font: 600 17px/1.3 var(--sans);
+    transition: color 0.25s var(--ease);
+  }
+  .flavor-row:hover .flavor-row__name {
+    color: var(--brand);
+  }
+  .flavor-row__summary {
+    display: block;
+    margin-top: 4px;
+    font-size: 14.5px;
+    line-height: 1.55;
+    color: var(--ink-2);
+  }
+  .flavor-row :global(.flavor-row__arrow) {
+    color: var(--brand);
+    transition: transform 0.25s var(--ease);
+  }
+  .flavor-row:hover :global(.flavor-row__arrow) {
+    transform: translateX(4px);
+  }
+  .flavors-foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px 32px;
+    margin-top: 40px;
+  }
+  .flavors-foot p {
+    max-width: 60ch;
+    color: var(--ink-2);
+  }
+
+  /* ---------- salada ---------- */
+  .salad {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: 64px;
+    align-items: center;
+  }
+  .salad__title {
+    margin-top: 12px;
+  }
+  .salad__body {
+    margin-top: 18px;
+    color: var(--ink-2);
+    max-width: 46ch;
+  }
+  .salad__cta {
+    margin-top: 32px;
+  }
+  .mosaic {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    aspect-ratio: 3 / 2;
+  }
+  .mosaic .photo {
+    height: 100%;
+  }
+  .mosaic__tall {
+    grid-row: span 2;
+  }
+
+  /* ---------- como chegar ---------- */
+  .visit {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: 64px;
+    align-items: center;
+  }
+  .visit__photo {
+    position: relative;
+    aspect-ratio: 4 / 5;
+  }
+  .visit__status {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: rgba(43, 37, 34, 0.82);
+    color: #fff;
+    font: 500 13px/1.2 var(--sans);
+  }
+  .visit__title {
+    margin-top: 12px;
+  }
+  .visit__addr {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    margin-top: 16px;
+    color: var(--ink-2);
+  }
+  .visit__addr :global(svg) {
+    color: var(--brand);
+    margin-top: 4px;
+  }
+  .visit__hours {
+    margin: 26px 0 30px;
+    max-width: 460px;
+  }
+  .visit__more {
+    margin-top: 20px;
+    font-size: 14.5px;
+    color: var(--ink-2);
+  }
+  .visit__more a {
+    color: var(--brand);
+    font-weight: 500;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  @media (max-width: 900px) {
+    .split,
+    .salad,
+    .visit {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 40px;
+    }
+    .split__photo--portrait,
+    .visit__photo {
+      aspect-ratio: 4 / 3;
+    }
+    .salad .mosaic {
+      order: -1;
+    }
+    .flavor-list {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  @media (max-width: 560px) {
+    .mosaic {
+      gap: 12px;
+      aspect-ratio: auto;
+      grid-template-rows: auto auto;
+    }
+    .mosaic .photo {
+      height: auto;
+    }
+    .mosaic__tall {
+      grid-column: span 2;
+      grid-row: auto;
+      aspect-ratio: 4 / 3;
+    }
+    .mosaic .photo:not(.mosaic__tall) {
+      aspect-ratio: 1;
+    }
+    .flavor-row {
+      grid-template-columns: 72px minmax(0, 1fr) auto;
+      gap: 16px;
+    }
+    .flavor-row__img {
+      width: 72px;
+      height: 72px;
+    }
+  }
+</style>

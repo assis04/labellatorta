@@ -1,0 +1,107 @@
+---
+/** Card de torta (cardápio, destaques, "outros sabores"). Link para a página do sabor. */
+import { Picture } from 'astro:assets';
+import type { Torta } from '../../data/menu';
+import { formatPrice, tagLabels } from '../../data/menu';
+import { href } from '../../lib/links';
+
+interface Props {
+  torta: Torta;
+  headingLevel?: 'h2' | 'h3';
+  /** Carregamento prioritário (só para cards visíveis sem rolar). */
+  eager?: boolean;
+}
+const { torta, headingLevel: Heading = 'h3', eager = false } = Astro.props;
+const badge = torta.tags.includes('vegetariana')
+  ? { text: tagLabels.vegetariana, cls: 'badge--veg' }
+  : torta.tags.includes('versao-apimentada')
+    ? { text: tagLabels['versao-apimentada'], cls: 'badge--hot' }
+    : torta.category === 'doce'
+      ? { text: 'Doce', cls: 'badge--sweet' }
+      : null;
+const slice = formatPrice(torta.price.slice);
+const whole = formatPrice(torta.price.whole);
+---
+
+<article class="torta-card" data-reveal>
+  <a class="torta-card__link" href={href(`/tortas/${torta.slug}/`)}>
+    <div class="torta-card__img photo">
+      <Picture
+        src={torta.photo.src}
+        alt={torta.photo.alt}
+        formats={['avif', 'webp']}
+        widths={[400, 640, 900]}
+        width={900}
+        sizes="(max-width: 560px) 100vw, (max-width: 900px) 50vw, 380px"
+        loading={eager ? 'eager' : 'lazy'}
+        decoding="async"
+      />
+      {badge && <span class:list={['badge', badge.cls, 'torta-card__badge']}>{badge.text}</span>}
+    </div>
+    <Heading class="h3 torta-card__title">{torta.name}</Heading>
+    <p class="torta-card__summary">{torta.summary}</p>
+    <p class="torta-card__price">
+      {slice || whole ? (
+        <>
+          {slice && (
+            <span>
+              Fatia <strong>{slice}</strong>
+            </span>
+          )}
+          {whole && (
+            <span>
+              Inteira <strong>{whole}</strong>
+            </span>
+          )}
+        </>
+      ) : (
+        <span>Fatia ou inteira · consulte o preço</span>
+      )}
+    </p>
+  </a>
+</article>
+
+<style>
+  .torta-card__link {
+    display: block;
+  }
+  .torta-card__img {
+    position: relative;
+    aspect-ratio: 4 / 3;
+  }
+  .torta-card__img :global(img) {
+    transition: transform 0.6s var(--ease);
+  }
+  .torta-card__link:hover .torta-card__img :global(img) {
+    transform: scale(1.04);
+  }
+  .torta-card__badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+  }
+  .torta-card__title {
+    margin-top: 18px;
+  }
+  .torta-card__link:hover .torta-card__title {
+    color: var(--brand);
+  }
+  .torta-card__summary {
+    margin-top: 6px;
+    font-size: 14.5px;
+    line-height: 1.6;
+    color: var(--ink-2);
+  }
+  .torta-card__price {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 16px;
+    margin-top: 12px;
+    font-size: 14px;
+    color: var(--ink-2);
+  }
+  .torta-card__price strong {
+    color: var(--brand);
+    font-weight: 600;
+  }
+</style>

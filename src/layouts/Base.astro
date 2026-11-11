@@ -1,0 +1,167 @@
+---
+/**
+ * Layout base de todas as páginas: <head> completo de SEO (title, description, canonical,
+ * Open Graph, robots), dados estruturados, fontes locais, cabeçalho, rodapé e WhatsApp flutuante.
+ * A CSP é injetada pelo Astro (security.csp no astro.config.mjs).
+ */
+import '@fontsource/cormorant-garamond/500.css';
+import '@fontsource/cormorant-garamond/500-italic.css';
+import '@fontsource/cormorant-garamond/600.css';
+import '@fontsource/cormorant-garamond/600-italic.css';
+import '@fontsource-variable/dm-sans/wght.css';
+import '@fontsource-variable/dm-sans/wght-italic.css';
+import '../styles/global.css';
+
+import serifFont from '@fontsource/cormorant-garamond/files/cormorant-garamond-latin-500-normal.woff2?url';
+import sansFont from '@fontsource-variable/dm-sans/files/dm-sans-latin-wght-normal.woff2?url';
+
+import type { ImageMetadata } from 'astro';
+import { getImage } from 'astro:assets';
+import { SITE_INDEXABLE, PLAUSIBLE_DOMAIN } from 'astro:env/server';
+import Header from '../components/ui/Header.astro';
+import Footer from '../components/ui/Footer.astro';
+import WhatsAppFab from '../components/ui/WhatsAppFab.astro';
+import defaultShareImage from '../assets/fotos/hero-fatia-frango-neon.jpg';
+import { business } from '../data/business';
+import { absoluteUrl } from '../lib/links';
+import {
+  breadcrumbSchema,
+  restaurantSchema,
+  serializeJsonLd,
+  websiteSchema,
+  type Crumb,
+  type JsonLd,
+  type SchemaContext,
+} from '../lib/schema';
+
+export interface Props {
+  /** Título da página. O layout acrescenta " · La Bella Torta", exceto com `fullTitle`. */
+  title: string;
+  fullTitle?: boolean;
+  /** 120–160 caracteres, com o que a página oferece e onde. */
+  description: string;
+  /** Caminho da página sem o base path, com barra no fim. Ex.: "/cardapio/". */
+  path: string;
+  /** Imagem de compartilhamento (cortada em 1200×630). */
+  shareImage?: ImageMetadata;
+  shareImageAlt?: string;
+  /** Dados estruturados específicos da página (Restaurant e WebSite já entram sempre). */
+  schema?: JsonLd[];
+  /** Gera BreadcrumbList no schema. */
+  crumbs?: readonly Crumb[];
+  /** Header transparente sobre a foto de topo (só a home). */
+  headerOverlay?: boolean;
+  noindex?: boolean;
+  ogType?: 'website' | 'article';
+}
+
+const {
+  title,
+  fullTitle = false,
+  description,
+  path,
+  shareImage = defaultShareImage,
+  shareImageAlt = 'Fatia de torta da La Bella Torta com o letreiro em neon da casa ao fundo',
+  schema = [],
+  crumbs,
+  headerOverlay = false,
+  noindex = false,
+  ogType = 'website',
+} = Astro.props;
+
+const pageTitle = fullTitle ? title : `${title} · ${business.name}`;
+const canonical = absoluteUrl(path, Astro.site);
+const homeUrl = absoluteUrl('/', Astro.site);
+const abs = (p: string) => absoluteUrl(p, Astro.site);
+
+const share = await getImage({
+  src: shareImage,
+  width: 1200,
+  height: 630,
+  fit: 'cover',
+  format: 'jpg',
+  quality: 80,
+});
+const shareUrl = new URL(share.src, Astro.site).toString();
+
+const ctx: SchemaContext = { homeUrl, abs, imageUrl: shareUrl };
+const jsonLd: JsonLd[] = [
+  restaurantSchema(ctx),
+  websiteSchema(ctx),
+  ...(crumbs ? [breadcrumbSchema(crumbs, ctx)] : []),
+  ...schema,
+];
+
+const indexable = SITE_INDEXABLE && !noindex;
+const robots = indexable ? 'index, follow, max-image-preview:large' : 'noindex, nofollow';
+const base = import.meta.env.BASE_URL.endsWith('/')
+  ? import.meta.env.BASE_URL
+  : `${import.meta.env.BASE_URL}/`;
+---
+
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta name="robots" content={robots} />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta name="theme-color" content="#FAF7F2" />
+    <meta name="format-detection" content="telephone=no" />
+
+    <link rel="icon" href={`${base}favicon.ico`} sizes="32x32" />
+    <link rel="icon" href={`${base}favicon.svg`} type="image/svg+xml" />
+    <link rel="apple-touch-icon" href={`${base}apple-touch-icon.png`} />
+    <link rel="manifest" href={`${base}site.webmanifest`} />
+
+    <link rel="preload" href={serifFont} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={sansFont} as="font" type="font/woff2" crossorigin />
+
+    <meta property="og:type" content={ogType} />
+    <meta property="og:locale" content="pt_BR" />
+    <meta property="og:site_name" content={business.name} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={shareUrl} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={shareImageAlt} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={shareUrl} />
+
+    <meta name="geo.region" content="BR-SP" />
+    <meta name="geo.placename" content={business.address.city} />
+    <meta name="geo.position" content={`${business.geo.latitude};${business.geo.longitude}`} />
+
+    <script type="application/ld+json" is:inline set:html={serializeJsonLd(jsonLd)} />
+    {PLAUSIBLE_DOMAIN && (
+      <script
+        is:inline
+        defer
+        data-domain={PLAUSIBLE_DOMAIN}
+        src="https://plausible.io/js/script.tagged-events.js"
+      />
+    )}
+    <slot name="head" />
+  </head>
+  <body>
+    <a class="skip-link" href="#conteudo">
+      Pular para o conteúdo
+    </a>
+    <Header overlay={headerOverlay} currentPath={path} />
+    <main id="conteudo" tabindex="-1">
+      <slot />
+    </main>
+    <Footer />
+    <WhatsAppFab />
+    <script>
+      import '../scripts/site';
+    </script>
+  </body>
+</html>

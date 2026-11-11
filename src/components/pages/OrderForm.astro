@@ -1,0 +1,794 @@
+---
+/**
+ * Formulário "Monte sua encomenda": monta a mensagem e abre o WhatsApp — não envia nada a servidor.
+ * `method="dialog"` fora de um <dialog> não navega: se o JS falhar, enviar não faz nada (nem põe
+ * dados na URL). Sem JavaScript (`scripting: none`) o formulário some e fica o link direto.
+ * A lógica está em src/scripts/order-form.ts; a prévia inicial usa a mesma função, no build.
+ */
+import Icon from '../ui/Icon.astro';
+import WhatsAppIcon from '../ui/WhatsAppIcon.astro';
+import { business, openingHours } from '../../data/business';
+import { doces, salgadas, tagLabels, type Torta } from '../../data/menu';
+import { whatsappUrl } from '../../lib/links';
+import {
+  EMPTY_DRAFT,
+  MAX_NAME_LENGTH,
+  MAX_NOTES_LENGTH,
+  MAX_QUANTITY,
+  previewLines,
+} from '../../scripts/order-form';
+import { daysLabel, openDays } from './hours-text';
+
+const groups: { id: string; label: string; items: readonly Torta[] }[] = [
+  { id: 'salgadas', label: 'Salgadas', items: salgadas },
+  { id: 'doces', label: 'Doces', items: doces },
+];
+const initialPreview = previewLines(EMPTY_DRAFT);
+const openLabel = daysLabel(openDays(openingHours));
+const SPICY_VARIANT = 'versão apimentada';
+---
+
+<noscript>
+  <div class="order-nojs">
+    <p>
+      Para montar a encomenda por aqui, o navegador precisa estar com o JavaScript ligado. Sem problema: chame
+      a gente direto no WhatsApp e conte o sabor, a quantidade e o dia.
+    </p>
+    <a
+      class="btn btn--primary"
+      href={whatsappUrl('encomenda')}
+      target="_blank"
+      rel="noopener"
+      data-track="whatsapp"
+      data-track-intent="encomenda-sem-js"
+    >
+      <WhatsAppIcon size={18} />
+      Encomendar pelo WhatsApp
+    </a>
+  </div>
+</noscript>
+
+<form class="order" method="dialog" novalidate data-order-form aria-labelledby="monte-titulo">
+  <div class="order__fields">
+    <fieldset class="step" aria-describedby="dica-sabores">
+      <legend class="step__title">
+        <span class="step__n" aria-hidden="true">
+          1
+        </span>
+        Quais sabores?
+      </legend>
+      <p class="step__hint" id="dica-sabores">
+        Marque um ou mais e diga quantas tortas inteiras de cada.
+      </p>
+      <p class="field-error" id="erro-sabores" data-error-for="sabores" hidden></p>
+
+      {groups.map((group) => (
+        <fieldset class="flavors">
+          <legend class="flavors__legend">{group.label}</legend>
+          <ul class="flavors__list">
+            {group.items.map((torta) => {
+              const spicy = torta.tags.includes('versao-apimentada');
+              const veg = torta.tags.includes('vegetariana');
+              return (
+                <li class="flavor" data-flavor={torta.slug}>
+                  <label class="flavor__label">
+                    <input
+                      class="check"
+                      type="checkbox"
+                      name="sabor"
+                      value={torta.slug}
+                      data-name={torta.name}
+                      data-field="sabores"
+                      data-flavor-check
+                    />
+                    <span class="flavor__name">{torta.name}</span>
+                    {veg && <span class="badge badge--veg flavor__badge">{tagLabels.vegetariana}</span>}
+                  </label>
+                  <div class="flavor__extra" data-flavor-extra hidden>
+                    <div class="qty" data-qty>
+                      <label class="qty__label" for={`qtd-${torta.slug}`}>
+                        Quantidade<span class="sr-only"> de {torta.name.toLowerCase()}</span>
+                      </label>
+                      <div class="qty__control">
+                        <button type="button" class="qty__btn" data-qty-step="-1">
+                          <span aria-hidden="true">−</span>
+                          <span class="sr-only">Uma a menos de {torta.name.toLowerCase()}</span>
+                        </button>
+                        <input
+                          class="qty__input"
+                          id={`qtd-${torta.slug}`}
+                          name={`qtd-${torta.slug}`}
+                          type="number"
+                          inputmode="numeric"
+                          min="1"
+                          max={MAX_QUANTITY}
+                          step="1"
+                          value="1"
+                          data-field={`qtd-${torta.slug}`}
+                          data-qty-input
+                        />
+                        <button type="button" class="qty__btn" data-qty-step="1">
+                          <span aria-hidden="true">+</span>
+                          <span class="sr-only">Uma a mais de {torta.name.toLowerCase()}</span>
+                        </button>
+                      </div>
+                    </div>
+                    <p
+                      class="field-error"
+                      id={`erro-qtd-${torta.slug}`}
+                      data-error-for={`qtd-${torta.slug}`}
+                      hidden
+                    />
+                    {spicy && (
+                      <label class="variant">
+                        <input class="check check--sm" type="checkbox" data-variant={SPICY_VARIANT} />
+                        Quero a {SPICY_VARIANT}
+                      </label>
+                    )}
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </fieldset>
+      ))}
+    </fieldset>
+
+    <div class="step">
+      <label class="step__title" for="encomenda-data">
+        <span class="step__n" aria-hidden="true">
+          2
+        </span>
+        Para quando?
+      </label>
+      <p class="step__hint" id="dica-data">
+        A casa abre de {openLabel}. A gente confirma o horário pelo WhatsApp.
+      </p>
+      <input
+        class="input input--date"
+        id="encomenda-data"
+        name="data"
+        type="date"
+        required
+        aria-describedby="dica-data"
+        data-field="data"
+      />
+      <p class="field-error" id="erro-data" data-error-for="data" hidden></p>
+    </div>
+
+    <fieldset class="step">
+      <legend class="step__title">
+        <span class="step__n" aria-hidden="true">
+          3
+        </span>
+        Retirar ou receber?
+      </legend>
+      <p class="field-error" id="erro-entrega" data-error-for="entrega" hidden></p>
+      <div class="choices">
+        <label class="choice">
+          <input class="radio" type="radio" name="entrega" value="retirar" required data-field="entrega" />
+          <span class="choice__title">Retirar na loja</span>
+          <span class="choice__text">
+            {business.address.street}, {business.address.neighborhood}
+          </span>
+          <Icon name="bag" class="choice__icon" />
+        </label>
+        <label class="choice">
+          <input class="radio" type="radio" name="entrega" value="receber" data-field="entrega" />
+          <span class="choice__title">Receber em casa</span>
+          <span class="choice__text">A entrega é combinada pelo WhatsApp</span>
+          <Icon name="pin" class="choice__icon" />
+        </label>
+      </div>
+    </fieldset>
+
+    <div class="step">
+      <label class="step__title" for="encomenda-nome">
+        <span class="step__n" aria-hidden="true">
+          4
+        </span>
+        Seu nome
+      </label>
+      <input
+        class="input"
+        id="encomenda-nome"
+        name="nome"
+        type="text"
+        autocomplete="name"
+        autocapitalize="words"
+        maxlength={MAX_NAME_LENGTH}
+        required
+        data-field="nome"
+      />
+      <p class="field-error" id="erro-nome" data-error-for="nome" hidden></p>
+    </div>
+
+    <div class="step">
+      <label class="step__title" for="encomenda-obs">
+        <span class="step__n" aria-hidden="true">
+          5
+        </span>
+        Alguma observação? <span class="step__optional">(opcional)</span>
+      </label>
+      <p class="step__hint" id="dica-obs">
+        Ex.: horário de preferência ou um recado para a gente.
+      </p>
+      <textarea
+        class="input input--area"
+        id="encomenda-obs"
+        name="observacoes"
+        rows="3"
+        maxlength={MAX_NOTES_LENGTH}
+        aria-describedby="dica-obs"
+        data-field="observacoes"
+      ></textarea>
+      <p class="field-error" id="erro-observacoes" data-error-for="observacoes" hidden></p>
+    </div>
+  </div>
+
+  <div class="order__aside">
+    <div class="summary">
+      <div class="summary__head">
+        <span class="summary__avatar">
+          <WhatsAppIcon size={20} />
+        </span>
+        <div>
+          <h3 class="summary__title" id="previa-titulo">
+            Sua mensagem
+          </h3>
+          <p class="summary__to">Para o WhatsApp {business.phone.display}</p>
+        </div>
+      </div>
+      <div class="summary__chat">
+        <output
+          class="bubble"
+          data-order-preview
+          aria-live="polite"
+          aria-atomic="false"
+          aria-labelledby="previa-titulo"
+        >
+          {initialPreview.map((line) => (
+            <span class={`bubble__${line.kind}`} aria-hidden={line.kind === 'gap' ? 'true' : undefined}>
+              {line.text}
+            </span>
+          ))}
+        </output>
+      </div>
+      <button type="submit" class="btn btn--primary btn--block summary__send">
+        <WhatsAppIcon size={18} />
+        Abrir no WhatsApp
+      </button>
+      <p class="summary__note">Abre numa nova aba com o texto pronto. Você confere e envia por lá.</p>
+      <p class="summary__status" data-order-status role="status"></p>
+    </div>
+    <p class="order__alt">
+      Prefere escrever do seu jeito?{' '}
+      <a
+        href={whatsappUrl('encomenda')}
+        target="_blank"
+        rel="noopener"
+        data-track="whatsapp"
+        data-track-intent="encomenda-link-direto"
+      >
+        Encomendar pelo WhatsApp<span class="sr-only"> (abre em nova aba)</span>
+      </a>
+    </p>
+  </div>
+</form>
+
+<script>
+  import { initOrderForm } from '../../scripts/order-form';
+  initOrderForm();
+</script>
+
+<style>
+  /* ---------- sem JavaScript: some o formulário, fica o link direto ---------- */
+  @media (scripting: none) {
+    .order {
+      display: none;
+    }
+  }
+  .order-nojs {
+    display: grid;
+    gap: 20px;
+    justify-items: start;
+    max-width: 640px;
+    padding: 28px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--card);
+    color: var(--ink-2);
+  }
+
+  /* ---------- estrutura ---------- */
+  .order {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(300px, 380px);
+    gap: 56px;
+    align-items: start;
+  }
+  .order [hidden] {
+    display: none;
+  }
+  .step {
+    margin: 0;
+    padding: 30px 0 0;
+    border: 0;
+    min-width: 0;
+  }
+  .step + .step {
+    margin-top: 30px;
+    border-top: 1px solid var(--line);
+  }
+  .order__fields > .step:first-child {
+    padding-top: 0;
+  }
+  .step__title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0;
+    font: 600 18px/1.3 var(--sans);
+    color: var(--ink);
+  }
+  .step__n {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1px solid var(--brand);
+    color: var(--brand);
+    display: grid;
+    place-items: center;
+    flex: none;
+    font: 600 13px/1 var(--sans);
+    font-variant-numeric: lining-nums tabular-nums;
+  }
+  .step__optional {
+    font-weight: 400;
+    color: var(--ink-2);
+  }
+  .step__hint {
+    margin-top: 8px;
+    color: var(--ink-2);
+    font-size: 14.5px;
+  }
+
+  /* ---------- erros ---------- */
+  .field-error {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-top: 10px;
+    color: var(--danger);
+    font: 500 14px/1.45 var(--sans);
+  }
+  .field-error::before {
+    content: '!';
+    content: '!' / '';
+    width: 18px;
+    height: 18px;
+    margin-top: 1px;
+    border-radius: 50%;
+    background: var(--danger);
+    color: #fff;
+    display: grid;
+    place-items: center;
+    flex: none;
+    font: 700 12px/1 var(--sans);
+  }
+
+  /* ---------- sabores ---------- */
+  .flavors {
+    margin: 22px 0 0;
+    padding: 0;
+    border: 0;
+    min-width: 0;
+  }
+  .flavors__legend {
+    padding: 0;
+    margin-bottom: 12px;
+    font: 500 11px/1.3 var(--sans);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+  .flavors__list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    align-items: start;
+  }
+  .flavor {
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--card);
+    transition:
+      border-color 0.2s var(--ease),
+      box-shadow 0.2s var(--ease);
+  }
+  .flavor:hover {
+    border-color: var(--ink-3);
+  }
+  .flavor:has(.check:checked) {
+    border-color: var(--brand);
+    box-shadow: inset 0 0 0 1px var(--brand);
+  }
+  .flavor__label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 58px;
+    padding: 12px 16px;
+    cursor: pointer;
+  }
+  .flavor__name {
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.35;
+  }
+  .flavor__badge {
+    margin-left: auto;
+    flex: none;
+  }
+  .flavor__extra {
+    display: grid;
+    gap: 12px;
+    padding: 2px 16px 16px 50px;
+  }
+
+  /* checkbox e rádio próprios (nativos por baixo: teclado e leitor de tela funcionam igual) */
+  .check,
+  .radio {
+    appearance: none;
+    margin: 0;
+    width: 22px;
+    height: 22px;
+    flex: none;
+    border: 1.5px solid var(--ink-3);
+    background: #fff;
+    display: grid;
+    place-content: center;
+    cursor: pointer;
+    transition:
+      background-color 0.2s var(--ease),
+      border-color 0.2s var(--ease);
+  }
+  .check {
+    border-radius: 6px;
+  }
+  .check--sm {
+    width: 20px;
+    height: 20px;
+  }
+  .check::before {
+    content: '';
+    width: 12px;
+    height: 12px;
+    background: #fff;
+    clip-path: polygon(14% 44%, 0 59%, 40% 96%, 100% 22%, 86% 8%, 39% 66%);
+    transform: scale(0);
+    transition: transform 0.15s var(--ease);
+  }
+  .check:checked {
+    background: var(--brand);
+    border-color: var(--brand);
+  }
+  .check:checked::before {
+    transform: scale(1);
+  }
+  .radio {
+    border-radius: 50%;
+  }
+  .radio::before {
+    content: '';
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--brand);
+    transform: scale(0);
+    transition: transform 0.15s var(--ease);
+  }
+  .radio:checked {
+    border-color: var(--brand);
+  }
+  .radio:checked::before {
+    transform: scale(1);
+  }
+  .check[aria-invalid='true'],
+  .radio[aria-invalid='true'] {
+    border-color: var(--danger);
+  }
+  @media (forced-colors: active) {
+    .check::before,
+    .radio::before {
+      background: CanvasText;
+    }
+  }
+
+  /* ---------- quantidade ---------- */
+  .qty {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .qty__label {
+    font-size: 14px;
+    color: var(--ink-2);
+  }
+  .qty__control {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid var(--ink-3);
+    border-radius: 999px;
+    background: #fff;
+  }
+  .qty__btn {
+    width: 44px;
+    height: 44px;
+    border: 0;
+    border-radius: 50%;
+    background: none;
+    color: var(--brand);
+    font: 500 20px/1 var(--sans);
+    display: grid;
+    place-items: center;
+  }
+  .qty__btn:hover {
+    background: var(--brand-50);
+  }
+  .qty__input {
+    width: 44px;
+    height: 44px;
+    border: 0;
+    background: none;
+    text-align: center;
+    font: 600 16px/1 var(--sans);
+    font-variant-numeric: tabular-nums;
+    appearance: textfield;
+    -moz-appearance: textfield;
+  }
+  .qty__input::-webkit-inner-spin-button,
+  .qty__input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  .qty__control:has(.qty__input[aria-invalid='true']) {
+    border-color: var(--danger);
+    box-shadow: 0 0 0 1px var(--danger);
+  }
+  .variant {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 44px;
+    font-size: 14.5px;
+    cursor: pointer;
+  }
+
+  /* ---------- campos de texto ---------- */
+  .input {
+    display: block;
+    width: 100%;
+    max-width: 440px;
+    min-height: 52px;
+    margin-top: 14px;
+    padding: 12px 16px;
+    border: 1px solid var(--ink-3);
+    border-radius: 12px;
+    background: #fff;
+    font-size: 16px;
+    transition:
+      border-color 0.2s var(--ease),
+      box-shadow 0.2s var(--ease);
+  }
+  .input:hover {
+    border-color: var(--ink-2);
+  }
+  .input:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 1px;
+    border-color: var(--brand);
+  }
+  .input[aria-invalid='true'] {
+    border-color: var(--danger);
+    box-shadow: 0 0 0 1px var(--danger);
+  }
+  .input--date {
+    max-width: 260px;
+  }
+  .input--area {
+    max-width: none;
+    min-height: 104px;
+    resize: vertical;
+    line-height: 1.55;
+  }
+
+  /* ---------- retirar ou receber ---------- */
+  .choices {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 18px;
+  }
+  .choice {
+    display: grid;
+    grid-template-columns: 22px minmax(0, 1fr) auto;
+    align-items: start;
+    gap: 4px 14px;
+    padding: 18px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--card);
+    cursor: pointer;
+    transition:
+      border-color 0.2s var(--ease),
+      box-shadow 0.2s var(--ease);
+  }
+  .choice:hover {
+    border-color: var(--ink-3);
+  }
+  .choice:has(.radio:checked) {
+    border-color: var(--brand);
+    box-shadow: inset 0 0 0 1px var(--brand);
+  }
+  .choice .radio {
+    grid-row: 1 / span 2;
+  }
+  .choice__title {
+    grid-column: 2;
+    font-weight: 600;
+    font-size: 15px;
+    line-height: 22px;
+  }
+  .choice__text {
+    grid-column: 2;
+    font-size: 14px;
+    color: var(--ink-2);
+    line-height: 1.5;
+  }
+  .choice :global(.choice__icon) {
+    grid-column: 3;
+    grid-row: 1;
+    width: 20px;
+    height: 20px;
+    color: var(--brand);
+  }
+
+  /* ---------- prévia ---------- */
+  .order__aside {
+    position: sticky;
+    top: calc(var(--header-h) + 24px);
+    display: grid;
+    gap: 16px;
+  }
+  .summary {
+    padding: 22px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--card);
+    box-shadow: 0 24px 48px -36px rgba(43, 37, 34, 0.35);
+  }
+  .summary__head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .summary__avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--whatsapp);
+    color: #fff;
+    display: grid;
+    place-items: center;
+    flex: none;
+  }
+  .summary__title {
+    font: 600 16px/1.3 var(--sans);
+  }
+  .summary__to {
+    font-size: 13px;
+    color: var(--ink-2);
+  }
+  .summary__chat {
+    margin-top: 18px;
+    padding: 16px 14px;
+    border-radius: 12px;
+    background: var(--bg-alt);
+    display: flex;
+    justify-content: flex-end;
+  }
+  .bubble {
+    display: block;
+    max-width: 94%;
+    padding: 12px 14px;
+    border-radius: 12px 4px 12px 12px;
+    background: #dcf5d2;
+    color: var(--ink);
+    font-size: 14px;
+    line-height: 1.55;
+    overflow-wrap: anywhere;
+    box-shadow: 0 1px 1px rgba(43, 37, 34, 0.08);
+  }
+  .bubble :global(.bubble__line),
+  .bubble :global(.bubble__hint) {
+    display: block;
+  }
+  .bubble :global(.bubble__gap) {
+    display: block;
+    height: 0.8em;
+  }
+  .bubble :global(.bubble__hint) {
+    color: var(--ink-2);
+    font-style: italic;
+  }
+  .summary__send {
+    margin-top: 18px;
+  }
+  .summary__note {
+    margin-top: 10px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--ink-2);
+    text-align: center;
+  }
+  .summary__status:empty {
+    display: none;
+  }
+  .summary__status {
+    margin-top: 14px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .summary__status[data-state='error'] {
+    background: #fbe9e4;
+    color: #8f2f19;
+  }
+  .summary__status[data-state='ok'] {
+    background: #e4efdf;
+    color: #2f5a26;
+  }
+  .summary__status :global(a) {
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .order__alt {
+    font-size: 14px;
+    color: var(--ink-2);
+    text-align: center;
+  }
+  .order__alt a {
+    color: var(--brand);
+    font-weight: 500;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  /* ---------- telas menores ---------- */
+  @media (max-width: 1000px) {
+    .order {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 40px;
+    }
+    .order__aside {
+      position: static;
+      max-width: 520px;
+    }
+  }
+  @media (max-width: 640px) {
+    .flavors__list,
+    .choices {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .flavor__extra {
+      padding-left: 16px;
+    }
+    .input--date {
+      max-width: none;
+    }
+  }
+</style>

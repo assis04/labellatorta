@@ -1,0 +1,109 @@
+---
+/**
+ * Retirada e entrega, com copy honesta: bairros, taxa e prazo de entrega ainda não foram
+ * confirmados pela casa, então a entrega aparece como "combine pelo WhatsApp".
+ */
+import Icon, { type IconName } from '../ui/Icon.astro';
+import WhatsAppIcon from '../ui/WhatsAppIcon.astro';
+import { business } from '../../data/business';
+import { whatsappUrl } from '../../lib/links';
+
+const steps: readonly { icon: IconName; text: string }[] = [
+  { icon: 'chat', text: 'Peça pelo WhatsApp' },
+  { icon: 'bag', text: 'Retire na loja ou combine a entrega' },
+  { icon: 'slice', text: 'Fatias ou tortas inteiras' },
+];
+---
+
+<section class="section section--alt" aria-labelledby="retirada-title">
+  <div class="container pickup">
+    <header class="pickup__head" data-reveal>
+      <span class="label">Retirada e entrega</span>
+      <h2 class="h2 pickup__title" id="retirada-title">
+        Leve a torta pra casa
+      </h2>
+      <p class="pickup__accent">{business.phone.display}</p>
+    </header>
+
+    <ul class="pickup__steps" data-reveal>
+      {steps.map((step) => (
+        <li>
+          <span class="icon-dot pickup__icon">
+            <Icon name={step.icon} size={22} />
+          </span>
+          {step.text}
+        </li>
+      ))}
+    </ul>
+
+    <a
+      class="btn btn--primary"
+      href={whatsappUrl('pedido')}
+      target="_blank"
+      rel="noopener"
+      data-track="whatsapp"
+      data-track-intent="home-retirada"
+    >
+      <WhatsAppIcon size={18} />
+      Pedir pelo WhatsApp
+    </a>
+  </div>
+</section>
+
+<style>
+  .pickup {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .pickup__head {
+    max-width: 640px;
+  }
+  .pickup__title {
+    margin-top: 12px;
+  }
+  .pickup__accent {
+    margin-top: 6px;
+    font: italic 500 24px/1.25 var(--serif);
+    color: var(--brand);
+  }
+  .pickup__steps {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 28px 56px;
+    margin: 40px 0 38px;
+  }
+  .pickup__steps li {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    max-width: 170px;
+    font-size: 14.5px;
+    font-weight: 500;
+    line-height: 1.4;
+  }
+  .pickup__icon {
+    width: 52px;
+    height: 52px;
+    background: var(--card);
+    border: 1px solid var(--line);
+  }
+  .pickup__icon :global(svg) {
+    width: 22px;
+    height: 22px;
+  }
+
+  @media (max-width: 560px) {
+    .pickup__steps {
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+    }
+    .pickup > .btn {
+      width: 100%;
+    }
+  }
+</style>

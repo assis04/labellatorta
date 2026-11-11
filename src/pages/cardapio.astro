@@ -1,0 +1,177 @@
+---
+/**
+ * Cardápio completo (/cardapio/): salgadas, doces, atalho para as vegetarianas, como pedir e
+ * chamada final. Tudo vem de src/data/menu.ts; preço null aparece como "consulte o preço".
+ * Schema: Menu com MenuSection/MenuItem (imagem otimizada de cada sabor) + BreadcrumbList.
+ */
+import Base from '../layouts/Base.astro';
+import CtaBand from '../components/ui/CtaBand.astro';
+import PageHero from '../components/ui/PageHero.astro';
+import SectionHead from '../components/ui/SectionHead.astro';
+import TortaCard from '../components/ui/TortaCard.astro';
+import MenuJump from '../components/menu/MenuJump.astro';
+import MenuOrderInfo from '../components/menu/MenuOrderInfo.astro';
+import TortaLinkList from '../components/menu/TortaLinkList.astro';
+import {
+  DESCRIPTION_MAX,
+  DESCRIPTION_MIN,
+  TITLE_MAX,
+  TITLE_SUFFIX,
+  joinList,
+  pickWithin,
+  shortName,
+} from '../components/menu/meta';
+import { schemaContext, schemaImageUrl } from '../components/menu/structured-data';
+import shareImage from '../assets/fotos/tortas-variadas.jpeg';
+import { business } from '../data/business';
+import { doces, salgadas, tortas, vegetarianas } from '../data/menu';
+import { menuSchema, type Crumb } from '../lib/schema';
+
+const path = '/cardapio/';
+const crumbs: Crumb[] = [
+  { name: 'Início', path: '/' },
+  { name: 'Cardápio', path },
+];
+const { neighborhood } = business.address;
+const vegSalgadas = vegetarianas.filter((t) => t.category === 'salgada');
+
+const title = 'Cardápio de tortas salgadas e doces';
+if (`${title}${TITLE_SUFFIX}`.length > TITLE_MAX)
+  throw new Error(`Título do cardápio passa de ${TITLE_MAX} caracteres`);
+const description = pickWithin(
+  [
+    `Cardápio da ${business.name}: ${salgadas.length} tortas salgadas, ${vegSalgadas.length} delas vegetarianas, e ${doces.length} doces, na fatia ou inteiras. No ${neighborhood}, Zona Leste de São Paulo.`,
+    `Cardápio da ${business.name}: ${salgadas.length} tortas salgadas e ${doces.length} doces, na fatia ou inteiras, no ${neighborhood}, Zona Leste de São Paulo.`,
+  ],
+  DESCRIPTION_MIN,
+  DESCRIPTION_MAX,
+  'Description do cardápio',
+);
+
+const imageUrls: Record<string, string> = Object.fromEntries(
+  await Promise.all(
+    tortas.map(async (t) => [t.slug, await schemaImageUrl(t.photo.src, Astro.site)] as const),
+  ),
+);
+const schema = [menuSchema(schemaContext(Astro.site), imageUrls)];
+
+const lead = `O cardápio da ${business.name} tem ${salgadas.length} tortas salgadas e ${doces.length} doces, todas com massa bem fininha e recheio generoso. Peça na fatia ou encomende a torta inteira pelo WhatsApp.`;
+const vegText = `Das ${salgadas.length} tortas salgadas, ${vegSalgadas.length} não levam carne: ${joinList(vegSalgadas.map(shortName))}. As doces, ${joinList(doces.map(shortName))}, também não levam carne.`;
+---
+
+<Base
+  title={title}
+  description={description}
+  path={path}
+  shareImage={shareImage}
+  shareImageAlt="Tortas salgadas e doces da La Bella Torta, inteiras e em fatias, sobre a bancada"
+  schema={schema}
+  crumbs={crumbs}
+>
+  <PageHero label="Cardápio" title="Cardápio de tortas" lead={lead} crumbs={crumbs}>
+    <MenuJump
+      items={[
+        { id: 'salgadas', label: 'Salgadas', count: salgadas.length },
+        { id: 'doces', label: 'Doces', count: doces.length },
+        { id: 'vegetarianas', label: 'Vegetarianas', count: vegSalgadas.length },
+      ]}
+    />
+  </PageHero>
+
+  <section class="section" id="salgadas" aria-labelledby="salgadas-title">
+    <div class="container">
+      <SectionHead
+        label="Salgadas"
+        title="Tortas salgadas"
+        id="salgadas-title"
+        align="left"
+        subtitle={`${salgadas.length} sabores com massa bem fininha só na base e nas bordas e duas camadas generosas de recheio.`}
+      />
+      <div class="menu-grid">
+        {salgadas.map((t) => (
+          <TortaCard torta={t} headingLevel="h3" />
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--alt" id="doces" aria-labelledby="doces-title">
+    <div class="container menu-doces">
+      <div class="menu-doces__head">
+        <SectionHead
+          label="Doces"
+          title="Tortas doces"
+          id="doces-title"
+          align="left"
+          subtitle={`${doces.length} sabores com massa bem fininha, para o recheio ser o protagonista. Saem na fatia ou inteiros.`}
+        />
+      </div>
+      {doces.map((t) => (
+        <TortaCard torta={t} headingLevel="h3" />
+      ))}
+    </div>
+  </section>
+
+  <section class="section" id="vegetarianas" aria-labelledby="vegetarianas-title">
+    <div class="container menu-veg">
+      <SectionHead
+        label="Sem carne"
+        title="Tortas vegetarianas"
+        id="vegetarianas-title"
+        align="left"
+        subtitle={vegText}
+      />
+      <div data-reveal>
+        <TortaLinkList tortas={vegSalgadas} />
+      </div>
+    </div>
+  </section>
+
+  <MenuOrderInfo />
+
+  <CtaBand title="Escolheu o sabor?" />
+</Base>
+
+<style>
+  .menu-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 44px 28px;
+    margin-top: 48px;
+  }
+  .menu-doces {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 44px 28px;
+    align-items: start;
+  }
+  .menu-doces__head {
+    padding-right: 12px;
+  }
+  .menu-veg {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: 40px 72px;
+    align-items: start;
+  }
+
+  @media (max-width: 900px) {
+    .menu-grid,
+    .menu-doces {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .menu-doces__head {
+      grid-column: 1 / -1;
+      padding-right: 0;
+    }
+    .menu-veg {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  @media (max-width: 560px) {
+    .menu-grid,
+    .menu-doces {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>
