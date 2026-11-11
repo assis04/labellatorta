@@ -1,0 +1,53 @@
+# La Bella Torta
+
+> Tortaria artesanal no Parque São Jorge, Zona Leste de São Paulo. Tortas salgadas e doces com massa fininha na base e duas camadas de recheio — na fatia, no almoço com salada ou inteiras por encomenda.
+
+Tortaria artesanal. Slogan: "Muito mais que uma simples torta".
+
+- Endereço: Rua Antônio Macedo, 339 – Parque São Jorge, São Paulo – SP (região do Tatuapé). Mapa: https://www.google.com/maps/search/?api=1&query=La%20Bella%20Torta%2C%20Rua%20Ant%C3%B4nio%20Macedo%2C%20339%20-%20Parque%20S%C3%A3o%20Jorge%2C%20S%C3%A3o%20Paulo%20-%20SP
+- Horário de funcionamento (horário de Brasília): Segunda a sexta, 11h às 21h; Sábado, 11h às 16h; Domingo, fechado.
+- WhatsApp e telefone: (11) 94736-7606 — https://wa.me/5511947367606?text=Ol%C3%A1%2C%20La%20Bella%20Torta!%20Gostaria%20de%20fazer%20um%20pedido.
+- E-mail: labellatorta339@gmail.com
+- Instagram: @labella_torta — https://www.instagram.com/labella_torta/
+- Facebook: https://www.facebook.com/labellatort
+- Reconhecimento: Recomendado pelo Restaurant Guru (2026).
+
+## Tortas salgadas
+
+- [Torta de frango](https://assis04.github.io/labellatorta/tortas/torta-de-frango/): Frango desfiado bem temperado, coberto com o creme de queijo da casa. Ingredientes: Frango desfiado temperado, Creme de queijo da casa, Massa fininha.
+- [Torta de calabresa](https://assis04.github.io/labellatorta/tortas/torta-de-calabresa/): Calabresa em recheio suculento, coberta com a receita secreta de creme de queijo. Também apimentada. Ingredientes: Linguiça calabresa, Creme de queijo da casa, Massa fininha.
+- [Torta de shimeji com cream cheese](https://assis04.github.io/labellatorta/tortas/torta-de-shimeji-com-cream-cheese/): Shimeji temperado com cebolinha e shoyu, sob uma camada de cream cheese. Vegetariana. Ingredientes: Shimeji, Cebolinha, Shoyu, Cream cheese, Massa fininha.
+- [Torta de palmito](https://assis04.github.io/labellatorta/tortas/torta-de-palmito/): Palmito com o tempero da casa, misturado ao legítimo Catupiry. Vegetariana. Ingredientes: Palmito, Catupiry, Tempero da casa, Massa fininha.
+- [Torta de camarão](https://assis04.github.io/labellatorta/tortas/torta-de-camarao/): Camarões num recheio de sabor marcante, coberto com creme de queijos. Ingredientes: Camarão, Creme de queijos da casa, Massa fininha.
+- [Torta de brócolis](https://assis04.github.io/labellatorta/tortas/torta-de-brocolis/): Brócolis bem verdinho e temperado, com cream cheese cremoso. Vegetariana. Ingredientes: Brócolis, Cream cheese, Massa fininha.
+
+## Tortas doces
+
+- [Torta banoffee](https://assis04.github.io/labellatorta/tortas/torta-banoffee/): Banana sobre doce de leite uruguaio, chantilly e raspas de chocolate belga. Ingredientes: Banana, Doce de leite uruguaio, Chantilly, Chocolate belga, Massa fininha.
+- [Torta de chocolate com paçoca](https://assis04.github.io/labellatorta/tortas/torta-de-chocolate-com-pacoca/): Ganache meio amargo coberto com paçoca, sobre massa bem fininha. Ingredientes: Ganache meio amargo, Paçoca, Massa fininha.
+
+## Páginas
+
+- [Início](https://assis04.github.io/labellatorta/)
+- [Cardápio](https://assis04.github.io/labellatorta/cardapio/): Os 8 sabores de torta, salgados e doces, com ingredientes.
+- [Almoço](https://assis04.github.io/labellatorta/almoco/): Almoço com fatia de torta salgada e salada da casa.
+- [Encomendas](https://assis04.github.io/labellatorta/encomendas/): Tortas inteiras por encomenda, combinadas pelo WhatsApp.
+- [Sobre nós](https://assis04.github.io/labellatorta/sobre/)
+- [Contato](https://assis04.github.io/labellatorta/contato/): Endereço, mapa, horário de funcionamento e WhatsApp.
+- [Perguntas frequentes](https://assis04.github.io/labellatorta/perguntas-frequentes/): Respostas sobre endereço, horário, pedidos, encomendas e opções vegetarianas.
+
+## Perguntas frequentes
+
+- [Onde fica a La Bella Torta?](https://assis04.github.io/labellatorta/perguntas-frequentes/): Na Rua Antônio Macedo, 339 – Parque São Jorge, São Paulo – SP, na região do Tatuapé, Zona Leste de São Paulo.
+- [Qual o horário de funcionamento?](https://assis04.github.io/labellatorta/perguntas-frequentes/): De segunda a sexta, das 11h às 21h. Aos sábados, das 11h às 16h. Aos domingos a casa fica fechada.
+- [Como faço um pedido?](https://assis04.github.io/labellatorta/perguntas-frequentes/): Pelo WhatsApp (11) 94736-7606. É só dizer o sabor e se é fatia ou torta inteira, e combinar a retirada ou a entrega.
+- [Dá para encomendar torta inteira?](https://assis04.github.io/labellatorta/perguntas-frequentes/): Sim. Todos os sabores podem ser encomendados inteiros pelo WhatsApp (11) 94736-7606: informe o sabor e o dia, e a gente combina a retirada ou a entrega.
+- [Vocês servem almoço?](https://assis04.github.io/labellatorta/perguntas-frequentes/): Sim. No almoço você escolhe uma fatia de torta salgada e acompanha com a salada da casa, de segunda a sábado, a partir das 11h.
+- [Tem opção vegetariana?](https://assis04.github.io/labellatorta/perguntas-frequentes/): Tem três tortas salgadas sem carne: shimeji com cream cheese, palmito e brócolis. As tortas doces — banoffee e chocolate com paçoca — também não levam carne.
+- [O que torna a torta da La Bella Torta diferente?](https://assis04.github.io/labellatorta/perguntas-frequentes/): A massa é bem fininha, só na base e nas bordas. Por cima vão duas camadas generosas de recheio, cobertas com o creme de queijo da casa — uma receita própria — e gratinadas no forno.
+- [Quais tortas doces vocês têm?](https://assis04.github.io/labellatorta/perguntas-frequentes/): Banoffee (banana, doce de leite uruguaio, chantilly e chocolate belga) e chocolate com paçoca (ganache meio amargo coberto com paçoca).
+
+## Optional
+
+- [Avaliações no Google](https://www.google.com/maps/search/?api=1&query=La%20Bella%20Torta%2C%20Rua%20Ant%C3%B4nio%20Macedo%2C%20339%20-%20Parque%20S%C3%A3o%20Jorge%2C%20S%C3%A3o%20Paulo%20-%20SP)
+- [Política de privacidade](https://assis04.github.io/labellatorta/politica-de-privacidade/)

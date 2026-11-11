@@ -1,0 +1,4 @@
+# Prévia: este endereço não é o site oficial e não deve ser indexado.
+
+User-agent: *
+Disallow: /
